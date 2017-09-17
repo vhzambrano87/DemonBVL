@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BusinessEntities;
-using Finisar.SQLite;
+using System.Data.SQLite;
 using System.Security.Permissions;
 
 namespace DataAccess

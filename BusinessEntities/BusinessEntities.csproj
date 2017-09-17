@@ -43,6 +43,7 @@
     <Compile Include="AccionBE.cs" />
     <Compile Include="CategoriaBE.cs" />
     <Compile Include="EmpresaBE.cs" />
+    <Compile Include="FeriadoBE.cs" />
     <Compile Include="PromedioBE.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

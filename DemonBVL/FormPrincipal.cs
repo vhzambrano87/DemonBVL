@@ -59,6 +59,7 @@ namespace DemonBVL
         {
             try
             {
+
                 ScrapingBrowser Browser = new ScrapingBrowser();
                 Browser.AllowAutoRedirect = true; // Browser has many settings you can access in setup
                 Browser.AllowMetaRedirect = true;
@@ -265,9 +266,9 @@ namespace DemonBVL
                 objUltima = new AccionBE();
                 objUltima = objAccionBL.UltimaFila(objEmpresa.nemonico);
                 objPromedio = new PromedioBE();
-                objPromedio.promedio= Math.Round(Convert.ToDecimal(objAccionBL.promedioNemonico(objEmpresa.nemonico,dtDesde.Value.ToShortDateString(),dtHasta.Value.ToShortDateString())), decimales);
+                objPromedio.promedio= Math.Round(Convert.ToDecimal(objAccionBL.promedioNemonico(objEmpresa.nemonico,dtDesde.Value.Date.ToString("yyyy-MM-dd"), dtHasta.Value.Date.ToString("yyyy-MM-dd"))), decimales);
                 objPromedio.nemonico = objEmpresa.nemonico;
-                objPromedio.promvsactual = Math.Round(Convert.ToDecimal((objPromedio.promedio == null || objUltima.valor==null) ? 0 : objUltima.valor/objPromedio.promedio), decimales);
+                objPromedio.promvsactual = Math.Round(Convert.ToDecimal((objPromedio.promedio == null || objUltima.valor==null || objPromedio.promedio==0) ? 0 : objUltima.valor/objPromedio.promedio), decimales);
                 objPromedio.actual = objUltima.valor;
                 objListPromedio.Add(objPromedio);
             }
@@ -402,6 +403,18 @@ namespace DemonBVL
                     });
 
             }
+        }
+
+        private void dtDesde_ValueChanged(object sender, EventArgs e)
+        {            
+            CargarPromedios();
+            dgPromedio.Refresh();
+        }
+
+        private void dtHasta_ValueChanged(object sender, EventArgs e)
+        {
+            CargarPromedios();
+            dgPromedio.Refresh();
         }
     }
 }

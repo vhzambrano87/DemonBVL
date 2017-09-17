@@ -53,6 +53,9 @@
             this.tbProm = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.CartesianChart = new LiveCharts.WinForms.CartesianChart();
+            this.TRANSACCIONES = new System.Windows.Forms.TabPage();
+            this.label14 = new System.Windows.Forms.Label();
+            this.CartesianChart2 = new LiveCharts.WinForms.CartesianChart();
             this.NEMONICOS = new System.Windows.Forms.TabPage();
             this.lblEmpresas = new System.Windows.Forms.Label();
             this.linkCategoria = new System.Windows.Forms.LinkLabel();
@@ -65,18 +68,15 @@
             this.label11 = new System.Windows.Forms.Label();
             this.dgNemonico = new System.Windows.Forms.DataGridView();
             this.btnDescargar = new System.Windows.Forms.Button();
-            this.TRANSACCIONES = new System.Windows.Forms.TabPage();
-            this.CartesianChart2 = new LiveCharts.WinForms.CartesianChart();
-            this.label14 = new System.Windows.Forms.Label();
             this.cbNemonico2 = new System.Windows.Forms.ComboBox();
             this.TabControl.SuspendLayout();
             this.PRINCIPAL.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOperaciones)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgPromedio)).BeginInit();
             this.COTIZACIONES.SuspendLayout();
+            this.TRANSACCIONES.SuspendLayout();
             this.NEMONICOS.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgNemonico)).BeginInit();
-            this.TRANSACCIONES.SuspendLayout();
             this.SuspendLayout();
             // 
             // TabControl
@@ -149,11 +149,13 @@
             // 
             // dtHasta
             // 
+            this.dtHasta.CustomFormat = "dd-MM-yyyy";
             this.dtHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dtHasta.Location = new System.Drawing.Point(197, 121);
             this.dtHasta.Name = "dtHasta";
             this.dtHasta.Size = new System.Drawing.Size(98, 20);
             this.dtHasta.TabIndex = 6;
+            this.dtHasta.ValueChanged += new System.EventHandler(this.dtHasta_ValueChanged);
             // 
             // label8
             // 
@@ -166,11 +168,13 @@
             // 
             // dtDesde
             // 
+            this.dtDesde.CustomFormat = "dd-MM-yyyy";
             this.dtDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.dtDesde.Location = new System.Drawing.Point(197, 95);
             this.dtDesde.Name = "dtDesde";
             this.dtDesde.Size = new System.Drawing.Size(98, 20);
             this.dtDesde.TabIndex = 4;
+            this.dtDesde.ValueChanged += new System.EventHandler(this.dtDesde_ValueChanged);
             // 
             // label6
             // 
@@ -326,6 +330,37 @@
             this.CartesianChart.TabIndex = 1;
             this.CartesianChart.Text = "CartesianChart";
             // 
+            // TRANSACCIONES
+            // 
+            this.TRANSACCIONES.Controls.Add(this.cbNemonico2);
+            this.TRANSACCIONES.Controls.Add(this.label14);
+            this.TRANSACCIONES.Controls.Add(this.CartesianChart2);
+            this.TRANSACCIONES.Location = new System.Drawing.Point(4, 22);
+            this.TRANSACCIONES.Name = "TRANSACCIONES";
+            this.TRANSACCIONES.Padding = new System.Windows.Forms.Padding(3);
+            this.TRANSACCIONES.Size = new System.Drawing.Size(992, 549);
+            this.TRANSACCIONES.TabIndex = 21;
+            this.TRANSACCIONES.Text = "TRANSACCIONES";
+            this.TRANSACCIONES.UseVisualStyleBackColor = true;
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label14.Location = new System.Drawing.Point(268, 35);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(84, 17);
+            this.label14.TabIndex = 11;
+            this.label14.Text = "Nemónico:";
+            // 
+            // CartesianChart2
+            // 
+            this.CartesianChart2.Location = new System.Drawing.Point(36, 68);
+            this.CartesianChart2.Name = "CartesianChart2";
+            this.CartesianChart2.Size = new System.Drawing.Size(916, 407);
+            this.CartesianChart2.TabIndex = 2;
+            this.CartesianChart2.Text = "CartesianChart2";
+            // 
             // NEMONICOS
             // 
             this.NEMONICOS.Controls.Add(this.lblEmpresas);
@@ -448,47 +483,13 @@
             this.btnDescargar.UseVisualStyleBackColor = true;
             this.btnDescargar.Click += new System.EventHandler(this.btnDescargar_Click);
             // 
-            // TRANSACCIONES
-            // 
-            this.TRANSACCIONES.Controls.Add(this.label14);
-            this.TRANSACCIONES.Controls.Add(this.cbNemonico2);
-            this.TRANSACCIONES.Controls.Add(this.CartesianChart2);
-            this.TRANSACCIONES.Location = new System.Drawing.Point(4, 22);
-            this.TRANSACCIONES.Name = "TRANSACCIONES";
-            this.TRANSACCIONES.Padding = new System.Windows.Forms.Padding(3);
-            this.TRANSACCIONES.Size = new System.Drawing.Size(992, 549);
-            this.TRANSACCIONES.TabIndex = 21;
-            this.TRANSACCIONES.Text = "TRANSACCIONES";
-            this.TRANSACCIONES.UseVisualStyleBackColor = true;
-            // 
-            // CartesianChart2
-            // 
-            this.CartesianChart2.Location = new System.Drawing.Point(36, 68);
-            this.CartesianChart2.Name = "CartesianChart2";
-            this.CartesianChart2.Size = new System.Drawing.Size(916, 407);
-            this.CartesianChart2.TabIndex = 2;
-            this.CartesianChart2.Text = "CartesianChart2";
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label14.Location = new System.Drawing.Point(268, 35);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(84, 17);
-            this.label14.TabIndex = 11;
-            this.label14.Text = "Nemónico:";
-            // 
             // cbNemonico2
             // 
-            this.cbNemonico2.DisplayMember = "nombre";
             this.cbNemonico2.FormattingEnabled = true;
-            this.cbNemonico2.Location = new System.Drawing.Point(367, 34);
+            this.cbNemonico2.Location = new System.Drawing.Point(392, 35);
             this.cbNemonico2.Name = "cbNemonico2";
-            this.cbNemonico2.Size = new System.Drawing.Size(209, 21);
-            this.cbNemonico2.TabIndex = 10;
-            this.cbNemonico2.ValueMember = "nemonico";
-            this.cbNemonico2.SelectedIndexChanged += new System.EventHandler(this.cbNemonico2_SelectedIndexChanged);
+            this.cbNemonico2.Size = new System.Drawing.Size(121, 21);
+            this.cbNemonico2.TabIndex = 12;
             // 
             // FormPrincipal
             // 
@@ -508,11 +509,11 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgPromedio)).EndInit();
             this.COTIZACIONES.ResumeLayout(false);
             this.COTIZACIONES.PerformLayout();
+            this.TRANSACCIONES.ResumeLayout(false);
+            this.TRANSACCIONES.PerformLayout();
             this.NEMONICOS.ResumeLayout(false);
             this.NEMONICOS.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgNemonico)).EndInit();
-            this.TRANSACCIONES.ResumeLayout(false);
-            this.TRANSACCIONES.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -558,8 +559,8 @@
         private System.Windows.Forms.Label lblEmpresas;
         private System.Windows.Forms.TabPage TRANSACCIONES;
         private System.Windows.Forms.Label label14;
-        private System.Windows.Forms.ComboBox cbNemonico2;
         private LiveCharts.WinForms.CartesianChart CartesianChart2;
+        private System.Windows.Forms.ComboBox cbNemonico2;
     }
 }
 
