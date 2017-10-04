@@ -41,7 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccionBE.cs" />
+    <Compile Include="AccionData.cs" />
     <Compile Include="CategoriaBE.cs" />
+    <Compile Include="CotizacionBE.cs" />
+    <Compile Include="DataBE.cs" />
     <Compile Include="EmpresaBE.cs" />
     <Compile Include="FeriadoBE.cs" />
     <Compile Include="PromedioBE.cs" />

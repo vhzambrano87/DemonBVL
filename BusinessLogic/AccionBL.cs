@@ -78,6 +78,25 @@ namespace BusinessLogic
             objAccionDA = new AccionDA();
             return objAccionDA.datosGraficoTransaccionFecha(nemonico);
         }
+
+        public List<DataBE> GenerateData(string desde, string hasta)
+        {
+            objAccionDA = new AccionDA();
+            return objAccionDA.GenerateData(desde, hasta);
+        }
+
+        public void eliminarData()
+        {
+            objAccionDA = new AccionDA();
+            objAccionDA.eliminarData();
+        }
+
+        public void LlenarReporte()
+        {
+            objAccionDA = new AccionDA();
+            objAccionDA.LlenarReporte();
+        }
+
         #endregion
 
     }

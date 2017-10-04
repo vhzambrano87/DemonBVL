@@ -38,11 +38,50 @@ namespace DataAccess
             }
         }
 
+        public void AgregarColumnaEmpresa(string empresa)
+        {
+            try
+            {
+                using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
+                {
+                    dbConn.Open();
+                    sqlite_cmd = dbConn.CreateCommand();
+                    sqlite_cmd.CommandText = @"alter table EMPRESA add column " +empresa+ " VARCHAR";
+                    sqlite_cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        public void EliminarColumnaEmpresa(string empresa)
+        {
+            try
+            {
+                using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
+                {
+                    dbConn.Open();
+                    sqlite_cmd = dbConn.CreateCommand();
+                    sqlite_cmd.CommandText = @"alter table EMPRESA add column " + empresa + " VARCHAR";
+                    sqlite_cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        //DROP TABLE IF EXISTS person ; 
+
         public void InsertarEmpresa(EmpresaBE objEmpresa)
         {
             try
             {
                 createTableEmpresa();
+                AgregarColumnaEmpresa(objEmpresa.nemonico);
 
                 using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
                 {
@@ -62,7 +101,7 @@ namespace DataAccess
         {
             try
             {
-                createTableEmpresa();
+                createTableEmpresa();                
 
                 using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
                 {

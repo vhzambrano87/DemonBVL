@@ -18,6 +18,9 @@ using LiveCharts.Definitions.Series;
 using LiveCharts.Wpf;
 using LiveCharts;
 using LiveCharts.Defaults;
+using System.IO;
+using System.Net;
+using Newtonsoft.Json;
 
 namespace DemonBVL
 {
@@ -40,8 +43,9 @@ namespace DemonBVL
                 dtDesde.Value =DateTime.ParseExact(ConfigurationManager.AppSettings["FechaInicio"], "yyyy-MM-dd", new CultureInfo("en-US"),DateTimeStyles.None);
 
                 cargaInicial();
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
@@ -56,6 +60,18 @@ namespace DemonBVL
         }
 
         private void btnDescargar_Click(object sender, EventArgs e)
+        {
+            if(rbAntiguaBVL.Checked)
+            {
+                Descargar1();
+            }
+            else
+            {
+                Descargar2();
+            }
+        }
+
+        public void Descargar1()
         {
             try
             {
@@ -96,8 +112,9 @@ namespace DemonBVL
                         continue;
                     }
 
-
-                    HtmlAgilityPack.HtmlDocument PageResult = new HtmlWeb().Load("http://www.bvl.com.pe/jsp/cotizacion.jsp?fec_inicio=" + fechaInicio.ToString("yyyyMMdd") + "&fec_fin=" + fechaFin + "&nemonico=" + objEmpresa.nemonico);
+                    string url = "http://www.bvl.com.pe/jsp/cotizacion.jsp?fec_inicio=" + fechaInicio.ToString("yyyyMMdd") + "&fec_fin=" + fechaFin + "&nemonico=" + objEmpresa.nemonico;
+                    HtmlAgilityPack.HtmlDocument PageResult = new HtmlWeb().Load(url);
+                                      
 
                     string xpath = "//tr";
                     var rows = PageResult.DocumentNode.SelectNodes(xpath);
@@ -140,6 +157,90 @@ namespace DemonBVL
                 MessageBox.Show("Error: " + ex.Message);
             }
         }
+
+        public void Descargar2()
+        {
+            try
+            {
+
+                ScrapingBrowser Browser = new ScrapingBrowser();
+                Browser.AllowAutoRedirect = true; // Browser has many settings you can access in setup
+                Browser.AllowMetaRedirect = true;
+
+                DateTime ultimaFecha;
+                DateTime fechaInicio = DateTime.ParseExact(ConfigurationManager.AppSettings["FechaInicio"], "yyyy-MM-dd", new CultureInfo("en-US"), DateTimeStyles.None);
+                string fechaFin = DateTime.Now.ToString("yyyyMMdd");
+
+
+                List<EmpresaBE> objLisEmpresa = objEmpresaBL.listarEmpresas();
+                int contEmpresas = objLisEmpresa.Count();
+                decimal partProgress = Math.Truncate(Convert.ToDecimal(100 / contEmpresas));
+                //LeerXML();
+                prgBar.Visible = true;
+                prgBar.UseWaitCursor = true;
+                foreach (var objEmpresa in objLisEmpresa)
+                {
+                    prgBar.Increment(Convert.ToInt32(partProgress));
+                    prgBar.Refresh();
+                    ultimaFecha = objAccionBL.ultimaFecha(objEmpresa.nemonico);
+                    if (DateTime.Now.Date > ultimaFecha.Date)
+                    {
+                        if (ultimaFecha.Date > Convert.ToDateTime(fechaInicio).Date)
+                        {
+                            fechaInicio = ultimaFecha;
+                        }
+
+                        //"yyyyMMdd"
+                    }
+                    if (DateTime.Now.Date == ultimaFecha.Date)
+                    {
+                        continue;
+                    }
+
+                    string servicio = "";
+
+                    var objRootCotizacion = LeerData(objEmpresa.nemonico, fechaInicio.ToString("yyyy"), fechaInicio.ToString("MM"), DateTime.Now.ToString("yyyy"), DateTime.Now.ToString("MM"));
+
+                    List<AccionBE> objListAccion = new List<AccionBE>();
+                    AccionBE objAccion;
+                    foreach (var row in objRootCotizacion.data)
+                    {
+
+                        objAccion = new AccionBE();
+
+                        objAccion.nemonico = objEmpresa.nemonico;
+
+                        objAccion.fecha = DateTime.ParseExact(row.fecDt, "dd/MM/yyyy", new CultureInfo("en-US")).ToString("yyyy-MM-dd");
+
+                        if (row.valLasts != "" && row.valLasts != null)
+                            objAccion.valor = Convert.ToDecimal(row.valLasts.Replace(",", ""));
+
+                        if (row.valVol != "")
+                            objAccion.num_acciones = Convert.ToDecimal(row.valVol.Replace(",", ""));
+
+                        if (row.valAmtSol != "")
+                            objAccion.monto_negociado = Convert.ToDecimal(row.valAmtSol.Replace(",", ""));
+
+                        objListAccion.Add(objAccion);
+
+                    }
+
+                    objAccionBL.insertarAcciones(objListAccion);
+
+                }
+                cargaInicial();
+                prgBar.UseWaitCursor = false;
+                prgBar.Visible = false;
+                prgBar.Value = 0;
+
+                MessageBox.Show("La descarga terminó con exito!!!.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
         private void LeerXML()
         {
             StringBuilder result = new StringBuilder();
@@ -415,6 +516,118 @@ namespace DemonBVL
         {
             CargarPromedios();
             dgPromedio.Refresh();
+        }
+
+        private void btBuscarData_Click(object sender, EventArgs e)
+        {
+            var objDataBL = new AccionBL();
+
+            dgData.DataSource = objDataBL.GenerateData(dtDesdeData.Value.ToString("yyyy-MM-dd"), dtHastaData.Value.ToString("yyyy-MM-dd"));
+            dgData.Refresh();
+/*
+            dgData.Columns[0].HeaderText = "FECHA";
+            dgData.Columns[1].HeaderText = "AIHC1";
+            dgData.Columns[2].HeaderText = "ALICORC1";
+            dgData.Columns[3].HeaderText = "BACKUBC1";
+            dgData.Columns[4].HeaderText = "BROCALC1";
+            dgData.Columns[5].HeaderText = "BROCALI1";
+            dgData.Columns[6].HeaderText = "BUENAVC1";
+            dgData.Columns[7].HeaderText = "CASAGRC1";
+            dgData.Columns[8].HeaderText = "CONTINC1";
+            dgData.Columns[9].HeaderText = "CORAREI1";
+            dgData.Columns[10].HeaderText = "CPACASC1";
+            dgData.Columns[11].HeaderText = "CREDITC1";
+            dgData.Columns[12].HeaderText = "CVERDEC1";
+            dgData.Columns[13].HeaderText = "DNT";
+            dgData.Columns[14].HeaderText = "ETERNII1";
+            dgData.Columns[15].HeaderText = "FERREYC1";
+            dgData.Columns[16].HeaderText = "GRAMONC1";
+            dgData.Columns[17].HeaderText = "IFS";
+            dgData.Columns[18].HeaderText = "LAREDOC1";
+            dgData.Columns[19].HeaderText = "LUSURC1";
+            dgData.Columns[20].HeaderText = "MILPOC1";
+            dgData.Columns[21].HeaderText = "MINSURI1";
+            dgData.Columns[22].HeaderText = "MOROCOI1";
+            dgData.Columns[23].HeaderText = "RELAPAC1";
+            dgData.Columns[24].HeaderText = "SCOTIAC1";
+            dgData.Columns[25].HeaderText = "SIDERC1";
+            dgData.Columns[26].HeaderText = "TELEFBC1";
+            dgData.Columns[27].HeaderText = "UNACEMC1";
+            dgData.Columns[28].HeaderText = "VOLCABC1";
+            */
+        }
+
+        private void btnEliminarData_Click(object sender, EventArgs e)
+        {
+            AccionBL objAccionBL = new AccionBL();
+            objAccionBL.eliminarData();
+        }
+
+        private RootCotizacion LeerData(string nemonico, string anoIni, string mesIni, string anoFin, string mesFin)
+        {
+            RootCotizacion objRootCotizacion = new RootCotizacion();
+            try
+            {
+                WebClient proxy = new WebClient();
+                string serviceurl = "https://www.bvl.com.pe/web/guest/informacion-general-empresa?p_p_id=informaciongeneral_WAR_servicesbvlportlet&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-2&p_p_col_count=1&_informaciongeneral_WAR_servicesbvlportlet_cmd=getListaHistoricoCotizaciones&_informaciongeneral_WAR_servicesbvlportlet_tabindex=4&_informaciongeneral_WAR_servicesbvlportlet_anoini=" + anoIni + "&_informaciongeneral_WAR_servicesbvlportlet_mesini=" + mesIni + "&_informaciongeneral_WAR_servicesbvlportlet_anofin=" + anoFin + "&_informaciongeneral_WAR_servicesbvlportlet_mesfin=" + mesFin + "&_informaciongeneral_WAR_servicesbvlportlet_nemonicoselect=" + nemonico;
+                byte[] data = proxy.DownloadData(serviceurl);
+                Stream memory = new MemoryStream(data);
+                var reader = new StreamReader(memory);
+                var result = reader.ReadToEnd();
+
+                objRootCotizacion = JsonConvert.DeserializeObject<RootCotizacion>(result);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return objRootCotizacion;
+        }
+
+        private void btnLlenarReporte_Click(object sender, EventArgs e)
+        {
+            AccionBL objAccion = new AccionBL();
+            objAccion.LlenarReporte();
+            MessageBox.Show("El proceso terminó con exito!!!.");
+        }
+
+        private void btnToExcel_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Excel Documents (*.xls)|*.xls";
+            sfd.FileName = "export.xls";
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                ExportarExcel(dgData, sfd.FileName);
+            }
+        }
+
+        private void ExportarExcel(DataGridView dGV, string filename)
+        {
+            string stOutput = "";
+            // Export titles:
+            string sHeaders = "";
+
+            for (int j = 0; j < dGV.Columns.Count; j++)
+                sHeaders = sHeaders.ToString() + Convert.ToString(dGV.Columns[j].HeaderText) + "\t";
+            stOutput += sHeaders + "\r\n";
+            // Export data.
+            for (int i = 0; i < dGV.RowCount - 1; i++)
+            {
+                string stLine = "";
+                for (int j = 0; j < dGV.Rows[i].Cells.Count; j++)
+                    stLine = stLine.ToString() + Convert.ToString(dGV.Rows[i].Cells[j].Value) + "\t";
+                stOutput += stLine + "\r\n";
+            }
+            Encoding utf16 = Encoding.GetEncoding(1254);
+            byte[] output = utf16.GetBytes(stOutput);
+            FileStream fs = new FileStream(filename, FileMode.Create);
+            BinaryWriter bw = new BinaryWriter(fs);
+            bw.Write(output, 0, output.Length); //write the encoded file
+            bw.Flush();
+            bw.Close();
+            fs.Close();
         }
     }
 }

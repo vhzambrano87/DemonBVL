@@ -30,6 +30,8 @@
         {
             this.TabControl = new System.Windows.Forms.TabControl();
             this.PRINCIPAL = new System.Windows.Forms.TabPage();
+            this.rbNuevaBVL = new System.Windows.Forms.RadioButton();
+            this.rbAntiguaBVL = new System.Windows.Forms.RadioButton();
             this.prgBar = new System.Windows.Forms.ProgressBar();
             this.label10 = new System.Windows.Forms.Label();
             this.dtpFecha = new System.Windows.Forms.DateTimePicker();
@@ -54,6 +56,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.CartesianChart = new LiveCharts.WinForms.CartesianChart();
             this.TRANSACCIONES = new System.Windows.Forms.TabPage();
+            this.cbNemonico2 = new System.Windows.Forms.ComboBox();
             this.label14 = new System.Windows.Forms.Label();
             this.CartesianChart2 = new LiveCharts.WinForms.CartesianChart();
             this.NEMONICOS = new System.Windows.Forms.TabPage();
@@ -67,8 +70,17 @@
             this.label12 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.dgNemonico = new System.Windows.Forms.DataGridView();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnLlenarReporte = new System.Windows.Forms.Button();
+            this.btBuscarData = new System.Windows.Forms.Button();
+            this.label16 = new System.Windows.Forms.Label();
+            this.dtHastaData = new System.Windows.Forms.DateTimePicker();
+            this.label15 = new System.Windows.Forms.Label();
+            this.dtDesdeData = new System.Windows.Forms.DateTimePicker();
+            this.dgData = new System.Windows.Forms.DataGridView();
             this.btnDescargar = new System.Windows.Forms.Button();
-            this.cbNemonico2 = new System.Windows.Forms.ComboBox();
+            this.btnEliminarData = new System.Windows.Forms.Button();
+            this.btnToExcel = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.PRINCIPAL.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOperaciones)).BeginInit();
@@ -77,6 +89,8 @@
             this.TRANSACCIONES.SuspendLayout();
             this.NEMONICOS.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgNemonico)).BeginInit();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgData)).BeginInit();
             this.SuspendLayout();
             // 
             // TabControl
@@ -85,6 +99,7 @@
             this.TabControl.Controls.Add(this.COTIZACIONES);
             this.TabControl.Controls.Add(this.TRANSACCIONES);
             this.TabControl.Controls.Add(this.NEMONICOS);
+            this.TabControl.Controls.Add(this.tabPage1);
             this.TabControl.Location = new System.Drawing.Point(39, 12);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
@@ -93,6 +108,8 @@
             // 
             // PRINCIPAL
             // 
+            this.PRINCIPAL.Controls.Add(this.rbNuevaBVL);
+            this.PRINCIPAL.Controls.Add(this.rbAntiguaBVL);
             this.PRINCIPAL.Controls.Add(this.prgBar);
             this.PRINCIPAL.Controls.Add(this.label10);
             this.PRINCIPAL.Controls.Add(this.dtpFecha);
@@ -111,6 +128,28 @@
             this.PRINCIPAL.TabIndex = 19;
             this.PRINCIPAL.Text = "PRINCIPAL";
             this.PRINCIPAL.UseVisualStyleBackColor = true;
+            // 
+            // rbNuevaBVL
+            // 
+            this.rbNuevaBVL.AutoSize = true;
+            this.rbNuevaBVL.Checked = true;
+            this.rbNuevaBVL.Location = new System.Drawing.Point(882, 42);
+            this.rbNuevaBVL.Name = "rbNuevaBVL";
+            this.rbNuevaBVL.Size = new System.Drawing.Size(80, 17);
+            this.rbNuevaBVL.TabIndex = 12;
+            this.rbNuevaBVL.TabStop = true;
+            this.rbNuevaBVL.Text = "Nueva BVL";
+            this.rbNuevaBVL.UseVisualStyleBackColor = true;
+            // 
+            // rbAntiguaBVL
+            // 
+            this.rbAntiguaBVL.AutoSize = true;
+            this.rbAntiguaBVL.Location = new System.Drawing.Point(882, 18);
+            this.rbAntiguaBVL.Name = "rbAntiguaBVL";
+            this.rbAntiguaBVL.Size = new System.Drawing.Size(84, 17);
+            this.rbAntiguaBVL.TabIndex = 11;
+            this.rbAntiguaBVL.Text = "Antigua BVL";
+            this.rbAntiguaBVL.UseVisualStyleBackColor = true;
             // 
             // prgBar
             // 
@@ -343,6 +382,17 @@
             this.TRANSACCIONES.Text = "TRANSACCIONES";
             this.TRANSACCIONES.UseVisualStyleBackColor = true;
             // 
+            // cbNemonico2
+            // 
+            this.cbNemonico2.DisplayMember = "nombre";
+            this.cbNemonico2.FormattingEnabled = true;
+            this.cbNemonico2.Location = new System.Drawing.Point(367, 34);
+            this.cbNemonico2.Name = "cbNemonico2";
+            this.cbNemonico2.Size = new System.Drawing.Size(209, 21);
+            this.cbNemonico2.TabIndex = 12;
+            this.cbNemonico2.ValueMember = "nemonico";
+            this.cbNemonico2.SelectedIndexChanged += new System.EventHandler(this.cbNemonico2_SelectedIndexChanged);
+            // 
             // label14
             // 
             this.label14.AutoSize = true;
@@ -473,6 +523,88 @@
             this.dgNemonico.TabIndex = 0;
             this.dgNemonico.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgNemonico_CellClick);
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.btnToExcel);
+            this.tabPage1.Controls.Add(this.btnLlenarReporte);
+            this.tabPage1.Controls.Add(this.btBuscarData);
+            this.tabPage1.Controls.Add(this.label16);
+            this.tabPage1.Controls.Add(this.dtHastaData);
+            this.tabPage1.Controls.Add(this.label15);
+            this.tabPage1.Controls.Add(this.dtDesdeData);
+            this.tabPage1.Controls.Add(this.dgData);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(992, 549);
+            this.tabPage1.TabIndex = 22;
+            this.tabPage1.Text = "DATA";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // btnLlenarReporte
+            // 
+            this.btnLlenarReporte.Location = new System.Drawing.Point(28, 27);
+            this.btnLlenarReporte.Name = "btnLlenarReporte";
+            this.btnLlenarReporte.Size = new System.Drawing.Size(116, 23);
+            this.btnLlenarReporte.TabIndex = 6;
+            this.btnLlenarReporte.Text = "Llenar Reporte";
+            this.btnLlenarReporte.UseVisualStyleBackColor = true;
+            this.btnLlenarReporte.Click += new System.EventHandler(this.btnLlenarReporte_Click);
+            // 
+            // btBuscarData
+            // 
+            this.btBuscarData.Location = new System.Drawing.Point(662, 27);
+            this.btBuscarData.Name = "btBuscarData";
+            this.btBuscarData.Size = new System.Drawing.Size(75, 23);
+            this.btBuscarData.TabIndex = 5;
+            this.btBuscarData.Text = "Buscar";
+            this.btBuscarData.UseVisualStyleBackColor = true;
+            this.btBuscarData.Click += new System.EventHandler(this.btBuscarData_Click);
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(495, 32);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(38, 13);
+            this.label16.TabIndex = 4;
+            this.label16.Text = "Hasta:";
+            // 
+            // dtHastaData
+            // 
+            this.dtHastaData.CustomFormat = "dd-MM-yyyy";
+            this.dtHastaData.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtHastaData.Location = new System.Drawing.Point(539, 28);
+            this.dtHastaData.Name = "dtHastaData";
+            this.dtHastaData.Size = new System.Drawing.Size(101, 20);
+            this.dtHastaData.TabIndex = 3;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(321, 32);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(41, 13);
+            this.label15.TabIndex = 2;
+            this.label15.Text = "Desde:";
+            // 
+            // dtDesdeData
+            // 
+            this.dtDesdeData.CustomFormat = "dd-MM-yyyy";
+            this.dtDesdeData.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dtDesdeData.Location = new System.Drawing.Point(368, 28);
+            this.dtDesdeData.Name = "dtDesdeData";
+            this.dtDesdeData.Size = new System.Drawing.Size(101, 20);
+            this.dtDesdeData.TabIndex = 1;
+            // 
+            // dgData
+            // 
+            this.dgData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgData.Location = new System.Drawing.Point(28, 64);
+            this.dgData.Name = "dgData";
+            this.dgData.Size = new System.Drawing.Size(937, 459);
+            this.dgData.TabIndex = 0;
+            // 
             // btnDescargar
             // 
             this.btnDescargar.Location = new System.Drawing.Point(28, 593);
@@ -483,19 +615,32 @@
             this.btnDescargar.UseVisualStyleBackColor = true;
             this.btnDescargar.Click += new System.EventHandler(this.btnDescargar_Click);
             // 
-            // cbNemonico2
+            // btnEliminarData
             // 
-            this.cbNemonico2.FormattingEnabled = true;
-            this.cbNemonico2.Location = new System.Drawing.Point(392, 35);
-            this.cbNemonico2.Name = "cbNemonico2";
-            this.cbNemonico2.Size = new System.Drawing.Size(121, 21);
-            this.cbNemonico2.TabIndex = 12;
+            this.btnEliminarData.Location = new System.Drawing.Point(118, 593);
+            this.btnEliminarData.Name = "btnEliminarData";
+            this.btnEliminarData.Size = new System.Drawing.Size(96, 23);
+            this.btnEliminarData.TabIndex = 11;
+            this.btnEliminarData.Text = "Eliminar Data!!";
+            this.btnEliminarData.UseVisualStyleBackColor = true;
+            this.btnEliminarData.Click += new System.EventHandler(this.btnEliminarData_Click);
+            // 
+            // btnToExcel
+            // 
+            this.btnToExcel.Location = new System.Drawing.Point(875, 27);
+            this.btnToExcel.Name = "btnToExcel";
+            this.btnToExcel.Size = new System.Drawing.Size(90, 23);
+            this.btnToExcel.TabIndex = 7;
+            this.btnToExcel.Text = "Exportar Excel";
+            this.btnToExcel.UseVisualStyleBackColor = true;
+            this.btnToExcel.Click += new System.EventHandler(this.btnToExcel_Click);
             // 
             // FormPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1084, 630);
+            this.Controls.Add(this.btnEliminarData);
             this.Controls.Add(this.TabControl);
             this.Controls.Add(this.btnDescargar);
             this.Name = "FormPrincipal";
@@ -514,6 +659,9 @@
             this.NEMONICOS.ResumeLayout(false);
             this.NEMONICOS.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgNemonico)).EndInit();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgData)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -561,6 +709,18 @@
         private System.Windows.Forms.Label label14;
         private LiveCharts.WinForms.CartesianChart CartesianChart2;
         private System.Windows.Forms.ComboBox cbNemonico2;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.DataGridView dgData;
+        private System.Windows.Forms.Button btBuscarData;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.DateTimePicker dtHastaData;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.DateTimePicker dtDesdeData;
+        private System.Windows.Forms.Button btnEliminarData;
+        private System.Windows.Forms.RadioButton rbNuevaBVL;
+        private System.Windows.Forms.RadioButton rbAntiguaBVL;
+        private System.Windows.Forms.Button btnLlenarReporte;
+        private System.Windows.Forms.Button btnToExcel;
     }
 }
 
