@@ -43,6 +43,10 @@ namespace DemonBVL
                 dtDesde.Value =DateTime.ParseExact(ConfigurationManager.AppSettings["FechaInicio"], "yyyy-MM-dd", new CultureInfo("en-US"),DateTimeStyles.None);
 
                 cargaInicial();
+                List<DataBE> objListData = new List<DataBE>();
+
+                dgData.DataSource = objListData;
+                dgData.Refresh();
 
             }
             catch (Exception ex)
@@ -61,14 +65,7 @@ namespace DemonBVL
 
         private void btnDescargar_Click(object sender, EventArgs e)
         {
-            if(rbAntiguaBVL.Checked)
-            {
-                Descargar1();
-            }
-            else
-            {
-                Descargar2();
-            }
+           Descargar2();
         }
 
         public void Descargar1()
@@ -439,7 +436,7 @@ namespace DemonBVL
             {
                 var data = objAccionBL.datosGrafico(cbNemonico.SelectedValue.ToString());
 
-                SeriesCollection objSerie = new SeriesCollection();
+                LiveCharts.SeriesCollection objSerie = new LiveCharts.SeriesCollection();
                 LineSeries objLine = new LineSeries();
                 objLine.Values = new ChartValues<double>();
                 foreach (var item in data)
@@ -453,7 +450,8 @@ namespace DemonBVL
                 CartesianChart.Series = objSerie;
 
                 CartesianChart.AxisX.Add(
-                    new Axis {
+                    new LiveCharts.Wpf.Axis
+                    {
                         Title = "Fecha",
                         Labels = objAccionBL.datosGraficoTransaccionFecha(cbNemonico.SelectedValue.ToString())
                     });
@@ -483,7 +481,7 @@ namespace DemonBVL
             {
                 var data = objAccionBL.datosGraficoTransaccion(cbNemonico2.SelectedValue.ToString());
 
-                SeriesCollection objSerie = new SeriesCollection();
+                LiveCharts.SeriesCollection objSerie = new LiveCharts.SeriesCollection();
                 LineSeries objLine = new LineSeries();
                 objLine.Values = new ChartValues<double>();
                 foreach (var item in data)
@@ -497,7 +495,7 @@ namespace DemonBVL
                 CartesianChart2.Series = objSerie;
 
                 CartesianChart2.AxisX.Add(
-                    new Axis
+                    new LiveCharts.Wpf.Axis
                     {
                         Title = "Fecha",
                         Labels = objAccionBL.datosGraficoTransaccionFecha(cbNemonico2.SelectedValue.ToString())
@@ -524,37 +522,6 @@ namespace DemonBVL
 
             dgData.DataSource = objDataBL.GenerateData(dtDesdeData.Value.ToString("yyyy-MM-dd"), dtHastaData.Value.ToString("yyyy-MM-dd"));
             dgData.Refresh();
-/*
-            dgData.Columns[0].HeaderText = "FECHA";
-            dgData.Columns[1].HeaderText = "AIHC1";
-            dgData.Columns[2].HeaderText = "ALICORC1";
-            dgData.Columns[3].HeaderText = "BACKUBC1";
-            dgData.Columns[4].HeaderText = "BROCALC1";
-            dgData.Columns[5].HeaderText = "BROCALI1";
-            dgData.Columns[6].HeaderText = "BUENAVC1";
-            dgData.Columns[7].HeaderText = "CASAGRC1";
-            dgData.Columns[8].HeaderText = "CONTINC1";
-            dgData.Columns[9].HeaderText = "CORAREI1";
-            dgData.Columns[10].HeaderText = "CPACASC1";
-            dgData.Columns[11].HeaderText = "CREDITC1";
-            dgData.Columns[12].HeaderText = "CVERDEC1";
-            dgData.Columns[13].HeaderText = "DNT";
-            dgData.Columns[14].HeaderText = "ETERNII1";
-            dgData.Columns[15].HeaderText = "FERREYC1";
-            dgData.Columns[16].HeaderText = "GRAMONC1";
-            dgData.Columns[17].HeaderText = "IFS";
-            dgData.Columns[18].HeaderText = "LAREDOC1";
-            dgData.Columns[19].HeaderText = "LUSURC1";
-            dgData.Columns[20].HeaderText = "MILPOC1";
-            dgData.Columns[21].HeaderText = "MINSURI1";
-            dgData.Columns[22].HeaderText = "MOROCOI1";
-            dgData.Columns[23].HeaderText = "RELAPAC1";
-            dgData.Columns[24].HeaderText = "SCOTIAC1";
-            dgData.Columns[25].HeaderText = "SIDERC1";
-            dgData.Columns[26].HeaderText = "TELEFBC1";
-            dgData.Columns[27].HeaderText = "UNACEMC1";
-            dgData.Columns[28].HeaderText = "VOLCABC1";
-            */
         }
 
         private void btnEliminarData_Click(object sender, EventArgs e)
@@ -594,13 +561,14 @@ namespace DemonBVL
 
         private void btnToExcel_Click(object sender, EventArgs e)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Excel Documents (*.xls)|*.xls";
-            sfd.FileName = "export.xls";
-            if (sfd.ShowDialog() == DialogResult.OK)
-            {
-                ExportarExcel(dgData, sfd.FileName);
-            }
+            //SaveFileDialog sfd = new SaveFileDialog();
+            //sfd.Filter = "Excel Documents (*.xls)|*.xls";
+            //sfd.FileName = "export.xls";
+            //if (sfd.ShowDialog() == DialogResult.OK)
+            //{
+            //    ExportarExcel(dgData, sfd.FileName);
+            //}
+            ExportarExcelDet();
         }
 
         private void ExportarExcel(DataGridView dGV, string filename)
@@ -629,5 +597,238 @@ namespace DemonBVL
             bw.Close();
             fs.Close();
         }
-    }
+
+        private void ExportarExcelDet()
+        {
+            try
+            {
+
+            
+            Microsoft.Office.Interop.Excel.Application xlApp;
+            Microsoft.Office.Interop.Excel.Workbook xlWorkBook;
+            Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet;
+            object misValue = System.Reflection.Missing.Value;
+            Microsoft.Office.Interop.Excel.Range chartRange;
+            string path = ConfigurationManager.AppSettings["PathExcel"];
+            FileInfo fi = new FileInfo(@path);
+            if (!fi.Exists)
+            {
+                xlApp = new Microsoft.Office.Interop.Excel.Application();
+                xlWorkBook = xlApp.Workbooks.Add(misValue);
+                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+            }
+            else
+            {
+                xlApp = new Microsoft.Office.Interop.Excel.Application();
+                xlWorkBook = xlApp.Workbooks.Open(@path);
+                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Sheets[1];
+            }
+                
+                //add data 
+                xlWorkSheet.Cells[1, 1] = "";
+                xlWorkSheet.Cells[1, 2] = "AIHC1";
+                xlWorkSheet.Cells[2, 1] = "FECHA";
+                xlWorkSheet.Cells[2, 2] = "VALOR";
+                xlWorkSheet.Cells[2, 3] = "M. NEG";
+                xlWorkSheet.Cells[1, 4] = "ALICORC1";
+                xlWorkSheet.Cells[2, 4] = "VALOR";
+                xlWorkSheet.Cells[2, 5] = "M. NEG";
+                xlWorkSheet.Cells[1, 6] = "BACKUBC1";
+                xlWorkSheet.Cells[2, 6] = "VALOR";
+                xlWorkSheet.Cells[2, 7] = "M. NEG";
+                xlWorkSheet.Cells[1, 8] = "BROCALC1";
+                xlWorkSheet.Cells[2, 8] = "VALOR";
+                xlWorkSheet.Cells[2, 9] = "M. NEG";
+                xlWorkSheet.Cells[1, 10] = "BROCALI1";
+                xlWorkSheet.Cells[2, 10] = "VALOR";
+                xlWorkSheet.Cells[2, 11] = "M. NEG";
+                xlWorkSheet.Cells[1, 12] = "BUENAVC1";
+                xlWorkSheet.Cells[2, 12] = "VALOR";
+                xlWorkSheet.Cells[2, 13] = "M. NEG";
+                xlWorkSheet.Cells[1, 14] = "CASAGRC1";
+                xlWorkSheet.Cells[2, 14] = "VALOR";
+                xlWorkSheet.Cells[2, 15] = "M. NEG";
+                xlWorkSheet.Cells[1, 16] = "CONTINC1";
+                xlWorkSheet.Cells[2, 16] = "VALOR";
+                xlWorkSheet.Cells[2, 17] = "M. NEG";
+                xlWorkSheet.Cells[1, 18] = "CORAREI1";
+                xlWorkSheet.Cells[2, 18] = "VALOR";
+                xlWorkSheet.Cells[2, 19] = "M. NEG";
+                xlWorkSheet.Cells[1, 20] = "CPACASC1";
+                xlWorkSheet.Cells[2, 20] = "VALOR";
+                xlWorkSheet.Cells[2, 21] = "M. NEG";
+                xlWorkSheet.Cells[1, 22] = "CREDITC1";
+                xlWorkSheet.Cells[2, 22] = "VALOR";
+                xlWorkSheet.Cells[2, 23] = "M. NEG";
+                xlWorkSheet.Cells[1, 24] = "CVERDEC1";
+                xlWorkSheet.Cells[2, 24] = "VALOR";
+                xlWorkSheet.Cells[2, 25] = "M. NEG";
+                xlWorkSheet.Cells[1, 26] = "DNT";
+                xlWorkSheet.Cells[2, 26] = "VALOR";
+                xlWorkSheet.Cells[2, 27] = "M. NEG";
+                xlWorkSheet.Cells[1, 28] = "ETERNII1";
+                xlWorkSheet.Cells[2, 28] = "VALOR";
+                xlWorkSheet.Cells[2, 29] = "M. NEG";
+                xlWorkSheet.Cells[1, 30] = "FERREYC1";
+                xlWorkSheet.Cells[2, 30] = "VALOR";
+                xlWorkSheet.Cells[2, 31] = "M. NEG";
+                xlWorkSheet.Cells[1, 32] = "GRAMONC1";
+                xlWorkSheet.Cells[2, 32] = "VALOR";
+                xlWorkSheet.Cells[2, 33] = "M. NEG";
+                xlWorkSheet.Cells[1, 34] = "IFS";
+                xlWorkSheet.Cells[2, 34] = "VALOR";
+                xlWorkSheet.Cells[2, 35] = "M. NEG";
+                xlWorkSheet.Cells[1, 36] = "LAREDOC1";
+                xlWorkSheet.Cells[2, 36] = "VALOR";
+                xlWorkSheet.Cells[2, 37] = "M. NEG";
+                xlWorkSheet.Cells[1, 38] = "LUSURC1";
+                xlWorkSheet.Cells[2, 38] = "VALOR";
+                xlWorkSheet.Cells[2, 39] = "M. NEG";
+                xlWorkSheet.Cells[1, 40] = "MILPOC1";
+                xlWorkSheet.Cells[2, 40] = "VALOR";
+                xlWorkSheet.Cells[2, 41] = "M. NEG";
+                xlWorkSheet.Cells[1, 42] = "MINSURI1";
+                xlWorkSheet.Cells[2, 42] = "VALOR";
+                xlWorkSheet.Cells[2, 43] = "M. NEG";
+                xlWorkSheet.Cells[1, 44] = "MOROCOI1";
+                xlWorkSheet.Cells[2, 44] = "VALOR";
+                xlWorkSheet.Cells[2, 45] = "M. NEG";
+                xlWorkSheet.Cells[1, 46] = "RELAPAC1";
+                xlWorkSheet.Cells[2, 46] = "VALOR";
+                xlWorkSheet.Cells[2, 47] = "M. NEG";
+                xlWorkSheet.Cells[1, 48] = "SCOTIAC1";
+                xlWorkSheet.Cells[2, 48] = "VALOR";
+                xlWorkSheet.Cells[2, 49] = "M. NEG";
+                xlWorkSheet.Cells[1, 50] = "SIDERC1";
+                xlWorkSheet.Cells[2, 50] = "VALOR";
+                xlWorkSheet.Cells[2, 51] = "M. NEG";
+                xlWorkSheet.Cells[1, 52] = "TELEFBC1";
+                xlWorkSheet.Cells[2, 52] = "VALOR";
+                xlWorkSheet.Cells[2, 53] = "M. NEG";
+                xlWorkSheet.Cells[1, 54] = "UNACEMC1";
+                xlWorkSheet.Cells[2, 54] = "VALOR";
+                xlWorkSheet.Cells[2, 55] = "M. NEG";
+                xlWorkSheet.Cells[1, 56] = "VOLCABC1";
+                xlWorkSheet.Cells[2, 56] = "VALOR";
+                xlWorkSheet.Cells[2, 57] = "M. NEG";
+
+
+                AccionBL objAccion = new AccionBL();
+
+                var listaDatos = objAccion.GenerateDataDet(dtDesdeData.Value.ToString("yyyy-MM-dd"), dtHastaData.Value.ToString("yyyy-MM-dd"));
+
+                int i = 3;
+                foreach (var item in listaDatos)
+                {
+                    xlWorkSheet.Cells[i, 1] = item.FECHA;
+                    xlWorkSheet.Cells[i, 2] = item.AIHC1_VAL;
+                    xlWorkSheet.Cells[i, 3] = item.AIHC1_MONTO;
+                    xlWorkSheet.Cells[i, 4] = item.ALICORC1_VAL;
+                    xlWorkSheet.Cells[i, 5] = item.ALICORC1_MONTO;
+                    xlWorkSheet.Cells[i, 6] = item.BACKUBC1_VAL;
+                    xlWorkSheet.Cells[i, 7] = item.BROCALC1_MONTO;
+                    xlWorkSheet.Cells[i, 8] = item.BROCALC1_VAL;
+                    xlWorkSheet.Cells[i, 9] = item.BROCALC1_MONTO;
+                    xlWorkSheet.Cells[i, 10] = item.BROCALI1_VAL;
+                    xlWorkSheet.Cells[i, 11] = item.BROCALI1_MONTO;
+                    xlWorkSheet.Cells[i, 12] = item.BUENAVC1_VAL;
+                    xlWorkSheet.Cells[i, 13] = item.BUENAVC1_MONTO;
+                    xlWorkSheet.Cells[i, 14] = item.CASAGRC1_VAL;
+                    xlWorkSheet.Cells[i, 15] = item.CASAGRC1_MONTO;
+                    xlWorkSheet.Cells[i, 16] = item.CONTINC1_VAL;
+                    xlWorkSheet.Cells[i, 17] = item.CONTINC1_MONTO;
+                    xlWorkSheet.Cells[i, 18] = item.CORAREI1_VAL;
+                    xlWorkSheet.Cells[i, 19] = item.CORAREI1_MONTO;
+                    xlWorkSheet.Cells[i, 20] = item.CPACASC1_VAL;
+                    xlWorkSheet.Cells[i, 21] = item.CPACASC1_MONTO;
+                    xlWorkSheet.Cells[i, 22] = item.CREDITC1_VAL;
+                    xlWorkSheet.Cells[i, 23] = item.CREDITC1_MONTO;
+                    xlWorkSheet.Cells[i, 24] = item.CVERDEC1_VAL;
+                    xlWorkSheet.Cells[i, 25] = item.CVERDEC1_MONTO;
+                    xlWorkSheet.Cells[i, 26] = item.DNT_VAL;
+                    xlWorkSheet.Cells[i, 27] = item.DNT_MONTO;
+                    xlWorkSheet.Cells[i, 28] = item.ETERNII1_VAL;
+                    xlWorkSheet.Cells[i, 29] = item.ETERNII1_MONTO;
+                    xlWorkSheet.Cells[i, 30] = item.FERREYC1_VAL;
+                    xlWorkSheet.Cells[i, 31] = item.FERREYC1_MONTO;
+                    xlWorkSheet.Cells[i, 32] = item.GRAMONC1_VAL;
+                    xlWorkSheet.Cells[i, 33] = item.GRAMONC1_MONTO;
+                    xlWorkSheet.Cells[i, 34] = item.IFS_VAL;
+                    xlWorkSheet.Cells[i, 35] = item.IFS_MONTO;
+                    xlWorkSheet.Cells[i, 36] = item.LAREDOC1_VAL;
+                    xlWorkSheet.Cells[i, 37] = item.LAREDOC1_MONTO;
+                    xlWorkSheet.Cells[i, 38] = item.LUSURC1_VAL;
+                    xlWorkSheet.Cells[i, 39] = item.LUSURC1_MONTO;
+                    xlWorkSheet.Cells[i, 40] = item.MILPOC1_VAL;
+                    xlWorkSheet.Cells[i, 41] = item.MILPOC1_MONTO;
+                    xlWorkSheet.Cells[i, 42] = item.MINSURI1_VAL;
+                    xlWorkSheet.Cells[i, 43] = item.MINSURI1_MONTO;
+                    xlWorkSheet.Cells[i, 44] = item.MOROCOI1_VAL;
+                    xlWorkSheet.Cells[i, 45] = item.MOROCOI1_MONTO;
+                    xlWorkSheet.Cells[i, 46] = item.RELAPAC1_VAL;
+                    xlWorkSheet.Cells[i, 47] = item.RELAPAC1_MONTO;
+                    xlWorkSheet.Cells[i, 48] = item.SCOTIAC1_VAL;
+                    xlWorkSheet.Cells[i, 49] = item.SCOTIAC1_MONTO;
+                    xlWorkSheet.Cells[i, 50] = item.SIDERC1_VAL;
+                    xlWorkSheet.Cells[i, 51] = item.SIDERC1_MONTO;
+                    xlWorkSheet.Cells[i, 52] = item.TELEFBC1_VAL;
+                    xlWorkSheet.Cells[i, 53] = item.TELEFBC1_MONTO;
+                    xlWorkSheet.Cells[i, 54] = item.UNACEMC1_VAL;
+                    xlWorkSheet.Cells[i, 55] = item.VOLCABC1_MONTO;
+                    xlWorkSheet.Cells[i, 56] = item.VOLCABC1_VAL;
+                    xlWorkSheet.Cells[i, 57] = item.VOLCABC1_MONTO;
+                    i++;
+
+                }
+
+                xlWorkSheet.get_Range("b1", "c1").Merge(true);
+                xlWorkSheet.get_Range("d1", "e1").Merge(true);
+                xlWorkSheet.get_Range("f1", "g1").Merge(true);
+                xlWorkSheet.get_Range("h1", "i1").Merge(true);
+                xlWorkSheet.get_Range("j1", "k1").Merge(true);
+                xlWorkSheet.get_Range("l1", "m1").Merge(true);
+                xlWorkSheet.get_Range("n1", "o1").Merge(true);
+                xlWorkSheet.get_Range("p1", "q1").Merge(true);
+                xlWorkSheet.get_Range("r1", "s1").Merge(true);
+                xlWorkSheet.get_Range("t1", "u1").Merge(true);
+                xlWorkSheet.get_Range("v1", "w1").Merge(true);
+                xlWorkSheet.get_Range("x1", "y1").Merge(true);
+                xlWorkSheet.get_Range("z1", "aa1").Merge(true);
+                xlWorkSheet.get_Range("ab1", "ac1").Merge(true);
+                xlWorkSheet.get_Range("ad1", "ae1").Merge(true);
+                xlWorkSheet.get_Range("af1", "ag1").Merge(true);
+                xlWorkSheet.get_Range("ah1", "ai1").Merge(true);
+                xlWorkSheet.get_Range("aj1", "ak1").Merge(true);
+                xlWorkSheet.get_Range("al1", "am1").Merge(true);
+                xlWorkSheet.get_Range("an1", "ao1").Merge(true);
+                xlWorkSheet.get_Range("ap1", "aq1").Merge(true);
+                xlWorkSheet.get_Range("ar1", "as1").Merge(true);
+                xlWorkSheet.get_Range("at1", "au1").Merge(true);
+                xlWorkSheet.get_Range("av1", "aw1").Merge(true);
+                xlWorkSheet.get_Range("ax1", "ay1").Merge(true);
+                xlWorkSheet.get_Range("az1", "ba1").Merge(true);
+                xlWorkSheet.get_Range("bb1", "bc1").Merge(true);
+                xlWorkSheet.get_Range("bd1", "be1").Merge(true);
+
+                xlWorkSheet.get_Range("a1", "be2000").HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+            
+            if (!fi.Exists)
+            {
+                xlWorkBook.SaveAs(@path, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+            }
+            else {
+                xlWorkBook.Save();
+
+            }
+                xlWorkBook.Close(true, misValue, misValue);
+                xlApp.Quit();
+            MessageBox.Show("Se exportó con éxito!!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        }
 }

@@ -85,6 +85,12 @@ namespace BusinessLogic
             return objAccionDA.GenerateData(desde, hasta);
         }
 
+        public List<DataDetBE> GenerateDataDet(string desde, string hasta)
+        {
+            objAccionDA = new AccionDA();
+            return objAccionDA.GenerateDataDet(desde, hasta);
+        }
+
         public void eliminarData()
         {
             objAccionDA = new AccionDA();

@@ -70,7 +70,8 @@ namespace DataAccess
                         if (objAccion.valor != null)
                         {
                             sqlite_cmd.CommandText = @"UPDATE DATA"
-                                 + " SET " + objAccion.nemonico + " = " + objAccion.valor
+                                 + " SET " + objAccion.nemonico + "_VAL = " + objAccion.valor
+                                 + ", " + objAccion.nemonico + "_MONTO = " + objAccion.monto_negociado
                                  + " WHERE FECHA = '" + objAccion.fecha +"'";
                             sqlite_cmd.ExecuteNonQuery();
                         }
@@ -101,7 +102,7 @@ namespace DataAccess
                     objAccion.nemonico = nemonico;
                     objAccion.fecha = Convert.ToDateTime(sqlite_datareader["fecha"].ToString()).ToString("yyyy-MM-dd");
                     objAccion.valor = decimal.TryParse(sqlite_datareader["valor"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-
+                    objAccion.monto_negociado = decimal.TryParse(sqlite_datareader["monto_negociado"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
                     result.Add(objAccion);
                 }                
             }
@@ -128,7 +129,8 @@ namespace DataAccess
                             sqlite_cmd = dbConn.CreateCommand();
 
                             sqlite_cmd.CommandText = @"UPDATE DATA"
-                            + " SET " + itemAccion.nemonico + " = " + itemAccion.valor
+                            + " SET " + itemAccion.nemonico + "_VAL = " + itemAccion.valor
+                            + ", " + itemAccion.nemonico + "_MONTO = " + itemAccion.monto_negociado
                             + " WHERE FECHA = '" + itemAccion.fecha + "'";
                             sqlite_cmd.ExecuteNonQuery();
                         }
@@ -401,9 +403,9 @@ namespace DataAccess
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = @"SELECT DISTINCT FECHA, AIHC1,ALICORC1 ,BACKUBC1 ,BROCALC1 ,BROCALI1 ,BUENAVC1 ,CASAGRC1 ,CONTINC1 ,CORAREI1 ,CPACASC1 ,CREDITC1 ,
-                                                CVERDEC1 ,DNT ,ETERNII1 ,FERREYC1 ,GRAMONC1 ,IFS ,LAREDOC1 ,LUSURC1 ,MILPOC1 ,MINSURI1 ,MOROCOI1 ,RELAPAC1 ,
-                                                SCOTIAC1 ,SIDERC1 ,TELEFBC1 ,UNACEMC1 ,VOLCABC1 
+                    sqlite_cmd.CommandText = @"SELECT DISTINCT FECHA, AIHC1_VAL,ALICORC1_VAL ,BACKUBC1_VAL ,BROCALC1_VAL ,BROCALI1_VAL ,BUENAVC1_VAL ,CASAGRC1_VAL ,CONTINC1_VAL ,CORAREI1_VAL ,CPACASC1_VAL ,CREDITC1_VAL ,
+                                                CVERDEC1_VAL ,DNT_VAL ,ETERNII1_VAL ,FERREYC1_VAL ,GRAMONC1_VAL ,IFS_VAL ,LAREDOC1_VAL ,LUSURC1_VAL ,MILPOC1_VAL ,MINSURI1_VAL ,MOROCOI1_VAL ,RELAPAC1_VAL ,
+                                                SCOTIAC1_VAL ,SIDERC1_VAL ,TELEFBC1_VAL ,UNACEMC1_VAL ,VOLCABC1_VAL 
                                                 FROM DATA 
                                                 WHERE  cast (strftime('%w', FECHA) as integer) not in (0,6) and fecha between '" + desde + "' and '"+ hasta +"'";
 
@@ -418,34 +420,34 @@ namespace DataAccess
                             {
                                 objData.FECHA = sqlite_datareader["FECHA"].ToString();
 
-                                objData.AIHC1 = decimal.TryParse(sqlite_datareader["AIHC1"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.ALICORC1 = decimal.TryParse(sqlite_datareader["ALICORC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.BACKUBC1 = decimal.TryParse(sqlite_datareader["BACKUBC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.BROCALC1 = decimal.TryParse(sqlite_datareader["BROCALC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.BROCALI1 = decimal.TryParse(sqlite_datareader["BROCALI1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.BUENAVC1 = decimal.TryParse(sqlite_datareader["BUENAVC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CASAGRC1 = decimal.TryParse(sqlite_datareader["CASAGRC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CONTINC1 = decimal.TryParse(sqlite_datareader["CONTINC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CORAREI1 = decimal.TryParse(sqlite_datareader["CORAREI1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CPACASC1 = decimal.TryParse(sqlite_datareader["CPACASC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CREDITC1 = decimal.TryParse(sqlite_datareader["CREDITC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.CVERDEC1 = decimal.TryParse(sqlite_datareader["CVERDEC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.DNT = decimal.TryParse(sqlite_datareader["DNT"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.ETERNII1 = decimal.TryParse(sqlite_datareader["ETERNII1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.FERREYC1 = decimal.TryParse(sqlite_datareader["FERREYC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.GRAMONC1 = decimal.TryParse(sqlite_datareader["GRAMONC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.IFS = decimal.TryParse(sqlite_datareader["IFS"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.LAREDOC1 = decimal.TryParse(sqlite_datareader["LAREDOC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.LUSURC1 = decimal.TryParse(sqlite_datareader["LUSURC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.MILPOC1 = decimal.TryParse(sqlite_datareader["MILPOC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.MINSURI1 = decimal.TryParse(sqlite_datareader["MINSURI1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.MOROCOI1 = decimal.TryParse(sqlite_datareader["MOROCOI1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.RELAPAC1 = decimal.TryParse(sqlite_datareader["RELAPAC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.SCOTIAC1 = decimal.TryParse(sqlite_datareader["SCOTIAC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.SIDERC1 = decimal.TryParse(sqlite_datareader["SIDERC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.TELEFBC1 = decimal.TryParse(sqlite_datareader["TELEFBC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.UNACEMC1 = decimal.TryParse(sqlite_datareader["UNACEMC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
-                                objData.VOLCABC1 = decimal.TryParse(sqlite_datareader["VOLCABC1"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.AIHC1 = decimal.TryParse(sqlite_datareader["AIHC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.ALICORC1 = decimal.TryParse(sqlite_datareader["ALICORC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.BACKUBC1 = decimal.TryParse(sqlite_datareader["BACKUBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.BROCALC1 = decimal.TryParse(sqlite_datareader["BROCALC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.BROCALI1 = decimal.TryParse(sqlite_datareader["BROCALI1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.BUENAVC1 = decimal.TryParse(sqlite_datareader["BUENAVC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CASAGRC1 = decimal.TryParse(sqlite_datareader["CASAGRC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CONTINC1 = decimal.TryParse(sqlite_datareader["CONTINC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CORAREI1 = decimal.TryParse(sqlite_datareader["CORAREI1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CPACASC1 = decimal.TryParse(sqlite_datareader["CPACASC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CREDITC1 = decimal.TryParse(sqlite_datareader["CREDITC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.CVERDEC1 = decimal.TryParse(sqlite_datareader["CVERDEC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.DNT = decimal.TryParse(sqlite_datareader["DNT_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.ETERNII1 = decimal.TryParse(sqlite_datareader["ETERNII1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.FERREYC1 = decimal.TryParse(sqlite_datareader["FERREYC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.GRAMONC1 = decimal.TryParse(sqlite_datareader["GRAMONC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.IFS = decimal.TryParse(sqlite_datareader["IFS_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.LAREDOC1 = decimal.TryParse(sqlite_datareader["LAREDOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.LUSURC1 = decimal.TryParse(sqlite_datareader["LUSURC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.MILPOC1 = decimal.TryParse(sqlite_datareader["MILPOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.MINSURI1 = decimal.TryParse(sqlite_datareader["MINSURI1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.MOROCOI1 = decimal.TryParse(sqlite_datareader["MOROCOI1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.RELAPAC1 = decimal.TryParse(sqlite_datareader["RELAPAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.SCOTIAC1 = decimal.TryParse(sqlite_datareader["SCOTIAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.SIDERC1 = decimal.TryParse(sqlite_datareader["SIDERC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.TELEFBC1 = decimal.TryParse(sqlite_datareader["TELEFBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.UNACEMC1 = decimal.TryParse(sqlite_datareader["UNACEMC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
+                                objData.VOLCABC1 = decimal.TryParse(sqlite_datareader["VOLCABC1_VAL"].ToString(), out tmpvalue) ? tmpvalue: (decimal?)null;
                             }
                             catch
                             {
@@ -464,7 +466,106 @@ namespace DataAccess
             return objLisData;
         }
 
+        public List<DataDetBE> GenerateDataDet(string desde, string hasta)
+        {
+            List<DataDetBE> objLisData = new List<DataDetBE>();
+            DataDetBE objData = new DataDetBE();
+            try
+            {
+                using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
+                {
+                    dbConn.Open();
+                    sqlite_cmd = dbConn.CreateCommand();
+                    sqlite_cmd.CommandText = @"SELECT DISTINCT FECHA, AIHC1_VAL,AIHC1_MONTO,ALICORC1_VAL ,ALICORC1_MONTO, BACKUBC1_VAL ,BACKUBC1_MONTO, BROCALC1_VAL ,BROCALC1_MONTO, BROCALI1_VAL ,BROCALI1_MONTO, BUENAVC1_VAL ,BUENAVC1_MONTO, CASAGRC1_VAL ,CASAGRC1_MONTO, CONTINC1_VAL ,CONTINC1_MONTO, CORAREI1_VAL ,CORAREI1_MONTO, CPACASC1_VAL ,CPACASC1_MONTO, CREDITC1_VAL ,CREDITC1_MONTO,
+                                                CVERDEC1_VAL ,CVERDEC1_MONTO, DNT_VAL ,DNT_MONTO, ETERNII1_VAL ,ETERNII1_MONTO, FERREYC1_VAL ,FERREYC1_MONTO, GRAMONC1_VAL ,GRAMONC1_MONTO, IFS_VAL ,IFS_MONTO, LAREDOC1_VAL ,LAREDOC1_MONTO, LUSURC1_VAL ,LUSURC1_MONTO, MILPOC1_VAL ,MILPOC1_MONTO, MINSURI1_VAL ,MINSURI1_MONTO, MOROCOI1_VAL ,MOROCOI1_MONTO, RELAPAC1_VAL ,RELAPAC1_MONTO,
+                                                SCOTIAC1_VAL, SCOTIAC1_MONTO ,SIDERC1_VAL ,SIDERC1_MONTO, TELEFBC1_VAL ,TELEFBC1_MONTO, UNACEMC1_VAL ,UNACEMC1_MONTO, VOLCABC1_VAL, VOLCABC1_MONTO 
+                                                FROM DATA 
+                                                WHERE  cast (strftime('%w', FECHA) as integer) not in (0,6) and fecha between '" + desde + "' and '" + hasta + "'";
 
+                    using (sqlite_datareader = sqlite_cmd.ExecuteReader())
+                    {
+
+                        decimal tmpvalue;
+                        while (sqlite_datareader.Read())
+                        {
+                            objData = new DataDetBE();
+                            try
+                            {
+                                objData.FECHA = sqlite_datareader["FECHA"].ToString();
+
+                                objData.AIHC1_VAL = decimal.TryParse(sqlite_datareader["AIHC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.AIHC1_MONTO = decimal.TryParse(sqlite_datareader["AIHC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.ALICORC1_VAL = decimal.TryParse(sqlite_datareader["ALICORC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.ALICORC1_MONTO = decimal.TryParse(sqlite_datareader["ALICORC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BACKUBC1_VAL = decimal.TryParse(sqlite_datareader["BACKUBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BACKUBC1_MONTO = decimal.TryParse(sqlite_datareader["BACKUBC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BROCALC1_VAL = decimal.TryParse(sqlite_datareader["BROCALC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BROCALC1_MONTO = decimal.TryParse(sqlite_datareader["BROCALC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BROCALI1_VAL = decimal.TryParse(sqlite_datareader["BROCALI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BROCALI1_MONTO = decimal.TryParse(sqlite_datareader["BROCALI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BUENAVC1_VAL = decimal.TryParse(sqlite_datareader["BUENAVC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.BUENAVC1_MONTO = decimal.TryParse(sqlite_datareader["BUENAVC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CASAGRC1_VAL = decimal.TryParse(sqlite_datareader["CASAGRC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CASAGRC1_MONTO = decimal.TryParse(sqlite_datareader["CASAGRC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CONTINC1_VAL = decimal.TryParse(sqlite_datareader["CONTINC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CONTINC1_MONTO = decimal.TryParse(sqlite_datareader["CONTINC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CORAREI1_VAL = decimal.TryParse(sqlite_datareader["CORAREI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CORAREI1_MONTO = decimal.TryParse(sqlite_datareader["CORAREI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CPACASC1_VAL = decimal.TryParse(sqlite_datareader["CPACASC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CPACASC1_MONTO = decimal.TryParse(sqlite_datareader["CPACASC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CREDITC1_VAL = decimal.TryParse(sqlite_datareader["CREDITC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CREDITC1_MONTO = decimal.TryParse(sqlite_datareader["CREDITC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CVERDEC1_VAL = decimal.TryParse(sqlite_datareader["CVERDEC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.CVERDEC1_MONTO = decimal.TryParse(sqlite_datareader["CVERDEC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.DNT_VAL = decimal.TryParse(sqlite_datareader["DNT_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.DNT_MONTO = decimal.TryParse(sqlite_datareader["DNT_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.ETERNII1_VAL = decimal.TryParse(sqlite_datareader["ETERNII1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.ETERNII1_MONTO = decimal.TryParse(sqlite_datareader["ETERNII1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.FERREYC1_VAL = decimal.TryParse(sqlite_datareader["FERREYC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.FERREYC1_MONTO = decimal.TryParse(sqlite_datareader["FERREYC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.GRAMONC1_VAL = decimal.TryParse(sqlite_datareader["GRAMONC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.GRAMONC1_MONTO = decimal.TryParse(sqlite_datareader["GRAMONC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.IFS_VAL = decimal.TryParse(sqlite_datareader["IFS_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.IFS_MONTO = decimal.TryParse(sqlite_datareader["IFS_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.LAREDOC1_VAL = decimal.TryParse(sqlite_datareader["LAREDOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.LAREDOC1_MONTO = decimal.TryParse(sqlite_datareader["LAREDOC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.LUSURC1_VAL = decimal.TryParse(sqlite_datareader["LUSURC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.LUSURC1_MONTO = decimal.TryParse(sqlite_datareader["LUSURC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MILPOC1_VAL = decimal.TryParse(sqlite_datareader["MILPOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MILPOC1_MONTO = decimal.TryParse(sqlite_datareader["MILPOC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MINSURI1_VAL = decimal.TryParse(sqlite_datareader["MINSURI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MINSURI1_MONTO = decimal.TryParse(sqlite_datareader["MINSURI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MOROCOI1_VAL = decimal.TryParse(sqlite_datareader["MOROCOI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.MOROCOI1_MONTO = decimal.TryParse(sqlite_datareader["MOROCOI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.RELAPAC1_VAL = decimal.TryParse(sqlite_datareader["RELAPAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.RELAPAC1_MONTO = decimal.TryParse(sqlite_datareader["RELAPAC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.SCOTIAC1_VAL = decimal.TryParse(sqlite_datareader["SCOTIAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.SCOTIAC1_MONTO = decimal.TryParse(sqlite_datareader["SCOTIAC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.SIDERC1_VAL = decimal.TryParse(sqlite_datareader["SIDERC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.SIDERC1_MONTO = decimal.TryParse(sqlite_datareader["SIDERC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.TELEFBC1_VAL = decimal.TryParse(sqlite_datareader["TELEFBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.TELEFBC1_MONTO = decimal.TryParse(sqlite_datareader["TELEFBC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.UNACEMC1_VAL = decimal.TryParse(sqlite_datareader["UNACEMC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.UNACEMC1_MONTO = decimal.TryParse(sqlite_datareader["UNACEMC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.VOLCABC1_VAL = decimal.TryParse(sqlite_datareader["VOLCABC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                objData.VOLCABC1_MONTO = decimal.TryParse(sqlite_datareader["VOLCABC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                            }
+                            catch(Exception ex)
+                            {
+
+                            }
+                            objLisData.Add(objData);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            return objLisData;
+        }
 
 
         public void eliminarData()

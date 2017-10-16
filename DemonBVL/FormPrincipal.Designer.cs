@@ -30,8 +30,6 @@
         {
             this.TabControl = new System.Windows.Forms.TabControl();
             this.PRINCIPAL = new System.Windows.Forms.TabPage();
-            this.rbNuevaBVL = new System.Windows.Forms.RadioButton();
-            this.rbAntiguaBVL = new System.Windows.Forms.RadioButton();
             this.prgBar = new System.Windows.Forms.ProgressBar();
             this.label10 = new System.Windows.Forms.Label();
             this.dtpFecha = new System.Windows.Forms.DateTimePicker();
@@ -71,6 +69,7 @@
             this.label11 = new System.Windows.Forms.Label();
             this.dgNemonico = new System.Windows.Forms.DataGridView();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnToExcel = new System.Windows.Forms.Button();
             this.btnLlenarReporte = new System.Windows.Forms.Button();
             this.btBuscarData = new System.Windows.Forms.Button();
             this.label16 = new System.Windows.Forms.Label();
@@ -80,7 +79,6 @@
             this.dgData = new System.Windows.Forms.DataGridView();
             this.btnDescargar = new System.Windows.Forms.Button();
             this.btnEliminarData = new System.Windows.Forms.Button();
-            this.btnToExcel = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.PRINCIPAL.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOperaciones)).BeginInit();
@@ -108,8 +106,6 @@
             // 
             // PRINCIPAL
             // 
-            this.PRINCIPAL.Controls.Add(this.rbNuevaBVL);
-            this.PRINCIPAL.Controls.Add(this.rbAntiguaBVL);
             this.PRINCIPAL.Controls.Add(this.prgBar);
             this.PRINCIPAL.Controls.Add(this.label10);
             this.PRINCIPAL.Controls.Add(this.dtpFecha);
@@ -128,28 +124,6 @@
             this.PRINCIPAL.TabIndex = 19;
             this.PRINCIPAL.Text = "PRINCIPAL";
             this.PRINCIPAL.UseVisualStyleBackColor = true;
-            // 
-            // rbNuevaBVL
-            // 
-            this.rbNuevaBVL.AutoSize = true;
-            this.rbNuevaBVL.Checked = true;
-            this.rbNuevaBVL.Location = new System.Drawing.Point(882, 42);
-            this.rbNuevaBVL.Name = "rbNuevaBVL";
-            this.rbNuevaBVL.Size = new System.Drawing.Size(80, 17);
-            this.rbNuevaBVL.TabIndex = 12;
-            this.rbNuevaBVL.TabStop = true;
-            this.rbNuevaBVL.Text = "Nueva BVL";
-            this.rbNuevaBVL.UseVisualStyleBackColor = true;
-            // 
-            // rbAntiguaBVL
-            // 
-            this.rbAntiguaBVL.AutoSize = true;
-            this.rbAntiguaBVL.Location = new System.Drawing.Point(882, 18);
-            this.rbAntiguaBVL.Name = "rbAntiguaBVL";
-            this.rbAntiguaBVL.Size = new System.Drawing.Size(84, 17);
-            this.rbAntiguaBVL.TabIndex = 11;
-            this.rbAntiguaBVL.Text = "Antigua BVL";
-            this.rbAntiguaBVL.UseVisualStyleBackColor = true;
             // 
             // prgBar
             // 
@@ -541,6 +515,16 @@
             this.tabPage1.Text = "DATA";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // btnToExcel
+            // 
+            this.btnToExcel.Location = new System.Drawing.Point(875, 27);
+            this.btnToExcel.Name = "btnToExcel";
+            this.btnToExcel.Size = new System.Drawing.Size(90, 23);
+            this.btnToExcel.TabIndex = 7;
+            this.btnToExcel.Text = "Exportar Excel";
+            this.btnToExcel.UseVisualStyleBackColor = true;
+            this.btnToExcel.Click += new System.EventHandler(this.btnToExcel_Click);
+            // 
             // btnLlenarReporte
             // 
             this.btnLlenarReporte.Location = new System.Drawing.Point(28, 27);
@@ -599,7 +583,6 @@
             // 
             // dgData
             // 
-            this.dgData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgData.Location = new System.Drawing.Point(28, 64);
             this.dgData.Name = "dgData";
             this.dgData.Size = new System.Drawing.Size(937, 459);
@@ -624,16 +607,6 @@
             this.btnEliminarData.Text = "Eliminar Data!!";
             this.btnEliminarData.UseVisualStyleBackColor = true;
             this.btnEliminarData.Click += new System.EventHandler(this.btnEliminarData_Click);
-            // 
-            // btnToExcel
-            // 
-            this.btnToExcel.Location = new System.Drawing.Point(875, 27);
-            this.btnToExcel.Name = "btnToExcel";
-            this.btnToExcel.Size = new System.Drawing.Size(90, 23);
-            this.btnToExcel.TabIndex = 7;
-            this.btnToExcel.Text = "Exportar Excel";
-            this.btnToExcel.UseVisualStyleBackColor = true;
-            this.btnToExcel.Click += new System.EventHandler(this.btnToExcel_Click);
             // 
             // FormPrincipal
             // 
@@ -717,8 +690,6 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.DateTimePicker dtDesdeData;
         private System.Windows.Forms.Button btnEliminarData;
-        private System.Windows.Forms.RadioButton rbNuevaBVL;
-        private System.Windows.Forms.RadioButton rbAntiguaBVL;
         private System.Windows.Forms.Button btnLlenarReporte;
         private System.Windows.Forms.Button btnToExcel;
     }
