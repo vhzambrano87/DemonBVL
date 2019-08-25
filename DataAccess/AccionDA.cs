@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using BusinessEntities;
 using System.Data.SQLite;
 using System.Security.Permissions;
+using System.Configuration;
 
 namespace DataAccess
 {
@@ -29,7 +30,9 @@ namespace DataAccess
                                            FECHA                DATE,
                                            VALOR                DOUBLE,
                                            MONTO_NEGOCIADO      DOUBLE,
-                                           NUM_ACCIONES         INT
+                                           NUM_ACCIONES         INT,
+                                           VALOR_MAX            DOUBLE,
+                                           VALOR_MIN            DOUBLE
                                         );";
                     sqlite_cmd.ExecuteNonQuery();
                 }
@@ -56,7 +59,7 @@ namespace DataAccess
                     {
                         sqlite_cmd.CommandText = "INSERT INTO "
                              + objAccion.nemonico
-                             + " (FECHA, VALOR, MONTO_NEGOCIADO, NUM_ACCIONES) VALUES ('" + objAccion.fecha + "'," + (objAccion.valor==null ? "null" : objAccion.valor.ToString()) + "," + (objAccion.monto_negociado == null ? "null" : objAccion.monto_negociado.ToString()) + "," + (objAccion.num_acciones == null ? "null" : objAccion.num_acciones.ToString()) + ");";
+                             + " (FECHA, VALOR, MONTO_NEGOCIADO, NUM_ACCIONES, VALOR_MAX, VALOR_MIN) VALUES ('" + objAccion.fecha + "'," + (objAccion.valor==null ? "null" : objAccion.valor.ToString()) + "," + (objAccion.monto_negociado == null ? "null" : objAccion.monto_negociado.ToString()) + "," + (objAccion.num_acciones == null ? "null" : objAccion.num_acciones.ToString()) + "," + (objAccion.maximo == null ? "null" : objAccion.maximo.ToString()) + "," + (objAccion.minimo == null ? "null" : objAccion.minimo.ToString()) + ")";
                         sqlite_cmd.ExecuteNonQuery();
 
                     }
@@ -72,6 +75,8 @@ namespace DataAccess
                             sqlite_cmd.CommandText = @"UPDATE DATA"
                                  + " SET " + objAccion.nemonico + "_VAL = " + objAccion.valor
                                  + ", " + objAccion.nemonico + "_MONTO = " + objAccion.monto_negociado
+                                 + ", " + objAccion.nemonico + "_VAL_MAX = " + (objAccion.maximo==null?"NULL" : objAccion.maximo.ToString())
+                                 + ", " + objAccion.nemonico + "_VAL_MIN = " + (objAccion.minimo==null?"NULL": objAccion.minimo.ToString())
                                  + " WHERE FECHA = '" + objAccion.fecha +"'";
                             sqlite_cmd.ExecuteNonQuery();
                         }
@@ -103,6 +108,9 @@ namespace DataAccess
                     objAccion.fecha = Convert.ToDateTime(sqlite_datareader["fecha"].ToString()).ToString("yyyy-MM-dd");
                     objAccion.valor = decimal.TryParse(sqlite_datareader["valor"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
                     objAccion.monto_negociado = decimal.TryParse(sqlite_datareader["monto_negociado"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                    objAccion.maximo = decimal.TryParse(sqlite_datareader["valor_max"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                    objAccion.minimo = decimal.TryParse(sqlite_datareader["valor_min"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+
                     result.Add(objAccion);
                 }                
             }
@@ -128,10 +136,13 @@ namespace DataAccess
                             dbConn.Open();
                             sqlite_cmd = dbConn.CreateCommand();
 
-                            sqlite_cmd.CommandText = @"UPDATE DATA"
-                            + " SET " + itemAccion.nemonico + "_VAL = " + itemAccion.valor
-                            + ", " + itemAccion.nemonico + "_MONTO = " + itemAccion.monto_negociado
+                            string query = "UPDATE DATA SET " + itemAccion.nemonico + "_VAL = " + itemAccion.valor.ToString()
+                            + ", " + itemAccion.nemonico + "_MONTO = " + (itemAccion.monto_negociado==null ? "NULL" : itemAccion.monto_negociado.ToString())
+                            + ", " + itemAccion.nemonico + "_VAL_MAX = " + (itemAccion.maximo == null ? "NULL" : itemAccion.maximo.ToString())
+                            + ", " + itemAccion.nemonico + "_VAL_MIN = " + (itemAccion.minimo == null ? "NULL" : itemAccion.minimo.ToString())
                             + " WHERE FECHA = '" + itemAccion.fecha + "'";
+
+                            sqlite_cmd.CommandText = query;
                             sqlite_cmd.ExecuteNonQuery();
                         }
                     }
@@ -286,8 +297,7 @@ namespace DataAccess
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
 
-                    //sqlite_cmd.CommandText = "select valor from (select fecha,valor from " + nemonico + " where valor is not null order by fecha desc limit 200) order by fecha asc";
-                    sqlite_cmd.CommandText = "select valor from (select fecha,valor from " + nemonico + " where valor is not null order by fecha desc) order by fecha asc";
+                    sqlite_cmd.CommandText = $"select valor from (select fecha,valor from {nemonico} where valor is not null and fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}' order by fecha desc) order by fecha asc";
                     sqlite_datareader = sqlite_cmd.ExecuteReader();
 
                     while (sqlite_datareader.Read())
@@ -312,7 +322,7 @@ namespace DataAccess
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
 
-                    sqlite_cmd.CommandText = "select monto_negociado from (select fecha,monto_negociado from " + nemonico + " where monto_negociado is not null order by fecha desc) order by fecha asc";
+                    sqlite_cmd.CommandText = $"select monto_negociado from (select fecha,monto_negociado from {nemonico} where monto_negociado is not null and where fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}' order by fecha desc) order by fecha asc";
                     sqlite_datareader = sqlite_cmd.ExecuteReader();
 
                     while (sqlite_datareader.Read())
@@ -337,7 +347,8 @@ namespace DataAccess
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
 
-                    sqlite_cmd.CommandText = "select fecha from (select fecha,monto_negociado from " + nemonico + " where monto_negociado is not null order by fecha desc) order by fecha asc";
+                    //sqlite_cmd.CommandText = $"select fecha from (select fecha,monto_negociado from {nemonico} where monto_negociado is not null and fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}' order by fecha desc) order by fecha asc";
+                    sqlite_cmd.CommandText = $"select fecha from (select fecha,valor from {nemonico} where valor is not null and fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}' order by fecha desc) order by fecha asc";
                     sqlite_datareader = sqlite_cmd.ExecuteReader();
 
                     while (sqlite_datareader.Read())
@@ -362,12 +373,9 @@ namespace DataAccess
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = @"select vl.VALOR, mx.VMAX,mn.VMIN from
-                                                (select max(valor) as VMAX from " + nemonico + @") as mx ,
-
-                                                (select min(valor) as VMIN from " + nemonico + @") as mn,
-
-                                                (select valor from " + nemonico + @" order by fecha desc limit 1) as vl";
+                    sqlite_cmd.CommandText = $@"select vl.VALOR, mx.VMAX,mn.VMIN from (select max(valor) as VMAX from {nemonico} where fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}' ) as mx ,
+                                                (select min(valor) as VMIN from {nemonico} where fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}') as mn,
+                                                (select valor from {nemonico} where fecha > '{ConfigurationManager.AppSettings["FechaInicio"]}'  order by fecha desc limit 1) as vl";
 
 
                     sqlite_datareader = sqlite_cmd.ExecuteReader();
@@ -466,105 +474,83 @@ namespace DataAccess
             return objLisData;
         }
 
-        public List<DataDetBE> GenerateDataDet(string desde, string hasta)
+        public List<DataAccionBE> GenerateDataDet(string desde, string hasta)
         {
-            List<DataDetBE> objLisData = new List<DataDetBE>();
-            DataDetBE objData = new DataDetBE();
+            List<DataAccionBE> objListDataAccion = new List<DataAccionBE>();
+            DataAccionBE objDataAccion = new DataAccionBE();
+            objDataAccion.LIST_DATA_ACCION_DET = new List<DataAccionDetBE>();
+            DataAccionDetBE objDataAccionDet = new DataAccionDetBE();
+
             try
             {
+                EmpresaDA objEmpresa = new EmpresaDA();
+                var objListEmpresa = objEmpresa.listarEmpresas().Where(x => x.excel == 1).ToList().OrderBy(x => x.nemonico).ToList();
+
+                if (objListEmpresa.Count == 0)
+                    return objListDataAccion;
+
                 using (var dbConn = new SQLiteConnection("Data Source=database.db;Version=3"))
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = @"SELECT DISTINCT FECHA, AIHC1_VAL,AIHC1_MONTO,ALICORC1_VAL ,ALICORC1_MONTO, BACKUBC1_VAL ,BACKUBC1_MONTO, BROCALC1_VAL ,BROCALC1_MONTO, BROCALI1_VAL ,BROCALI1_MONTO, BUENAVC1_VAL ,BUENAVC1_MONTO, CASAGRC1_VAL ,CASAGRC1_MONTO, CONTINC1_VAL ,CONTINC1_MONTO, CORAREI1_VAL ,CORAREI1_MONTO, CPACASC1_VAL ,CPACASC1_MONTO, CREDITC1_VAL ,CREDITC1_MONTO,
-                                                CVERDEC1_VAL ,CVERDEC1_MONTO, DNT_VAL ,DNT_MONTO, ETERNII1_VAL ,ETERNII1_MONTO, FERREYC1_VAL ,FERREYC1_MONTO, GRAMONC1_VAL ,GRAMONC1_MONTO, IFS_VAL ,IFS_MONTO, LAREDOC1_VAL ,LAREDOC1_MONTO, LUSURC1_VAL ,LUSURC1_MONTO, MILPOC1_VAL ,MILPOC1_MONTO, MINSURI1_VAL ,MINSURI1_MONTO, MOROCOI1_VAL ,MOROCOI1_MONTO, RELAPAC1_VAL ,RELAPAC1_MONTO,
-                                                SCOTIAC1_VAL, SCOTIAC1_MONTO ,SIDERC1_VAL ,SIDERC1_MONTO, TELEFBC1_VAL ,TELEFBC1_MONTO, UNACEMC1_VAL ,UNACEMC1_MONTO, VOLCABC1_VAL, VOLCABC1_MONTO 
-                                                FROM DATA 
-                                                WHERE  cast (strftime('%w', FECHA) as integer) not in (0,6) and fecha between '" + desde + "' and '" + hasta + "'";
+                    string query = "SELECT DISTINCT FECHA, ";
+
+                    foreach (var item in objListEmpresa)
+                    {
+                        query = query + "'" + item.nemonico + "', ";
+                        query = query + item.nemonico + "_VAL, ";
+                        query = query + item.nemonico + "_MONTO, ";
+                        query = query + item.nemonico + "_VAL_MAX, ";
+                        query = query + item.nemonico + "_VAL_MIN, ";
+                    }
+                    query = query.Substring(0, query.Length - 2);
+                    query = query + " FROM DATA";
+                    query = query + "  WHERE  cast (strftime('%w', FECHA) as integer) not in (0,6) and fecha between '" + desde + "' and '" + hasta + "'";
+
+                    sqlite_cmd.CommandText = query;
 
                     using (sqlite_datareader = sqlite_cmd.ExecuteReader())
                     {
-
                         decimal tmpvalue;
                         while (sqlite_datareader.Read())
                         {
-                            objData = new DataDetBE();
                             try
                             {
-                                objData.FECHA = sqlite_datareader["FECHA"].ToString();
+                                objDataAccion = new DataAccionBE();
+                                objDataAccion.LIST_DATA_ACCION_DET = new List<DataAccionDetBE>();
+                                objDataAccion.FECHA = sqlite_datareader.GetValue(0).ToString();
+                                
+                                for (int i = 1; i < sqlite_datareader.FieldCount; i++)
+                                {
+                                    objDataAccionDet = new DataAccionDetBE();
+                                    
+                                    objDataAccionDet.ACCION = sqlite_datareader.GetValue(i).ToString();
+                                    i++;
+                                    objDataAccionDet.CIERRE = decimal.TryParse(sqlite_datareader.GetValue(i).ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                    i++;
+                                    objDataAccionDet.MONTO = decimal.TryParse(sqlite_datareader.GetValue(i).ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                    i++;
+                                    objDataAccionDet.MAX = decimal.TryParse(sqlite_datareader.GetValue(i).ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                    i++;
+                                    objDataAccionDet.MIN = decimal.TryParse(sqlite_datareader.GetValue(i).ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
 
-                                objData.AIHC1_VAL = decimal.TryParse(sqlite_datareader["AIHC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.AIHC1_MONTO = decimal.TryParse(sqlite_datareader["AIHC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.ALICORC1_VAL = decimal.TryParse(sqlite_datareader["ALICORC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.ALICORC1_MONTO = decimal.TryParse(sqlite_datareader["ALICORC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BACKUBC1_VAL = decimal.TryParse(sqlite_datareader["BACKUBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BACKUBC1_MONTO = decimal.TryParse(sqlite_datareader["BACKUBC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BROCALC1_VAL = decimal.TryParse(sqlite_datareader["BROCALC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BROCALC1_MONTO = decimal.TryParse(sqlite_datareader["BROCALC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BROCALI1_VAL = decimal.TryParse(sqlite_datareader["BROCALI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BROCALI1_MONTO = decimal.TryParse(sqlite_datareader["BROCALI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BUENAVC1_VAL = decimal.TryParse(sqlite_datareader["BUENAVC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.BUENAVC1_MONTO = decimal.TryParse(sqlite_datareader["BUENAVC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CASAGRC1_VAL = decimal.TryParse(sqlite_datareader["CASAGRC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CASAGRC1_MONTO = decimal.TryParse(sqlite_datareader["CASAGRC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CONTINC1_VAL = decimal.TryParse(sqlite_datareader["CONTINC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CONTINC1_MONTO = decimal.TryParse(sqlite_datareader["CONTINC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CORAREI1_VAL = decimal.TryParse(sqlite_datareader["CORAREI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CORAREI1_MONTO = decimal.TryParse(sqlite_datareader["CORAREI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CPACASC1_VAL = decimal.TryParse(sqlite_datareader["CPACASC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CPACASC1_MONTO = decimal.TryParse(sqlite_datareader["CPACASC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CREDITC1_VAL = decimal.TryParse(sqlite_datareader["CREDITC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CREDITC1_MONTO = decimal.TryParse(sqlite_datareader["CREDITC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CVERDEC1_VAL = decimal.TryParse(sqlite_datareader["CVERDEC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.CVERDEC1_MONTO = decimal.TryParse(sqlite_datareader["CVERDEC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.DNT_VAL = decimal.TryParse(sqlite_datareader["DNT_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.DNT_MONTO = decimal.TryParse(sqlite_datareader["DNT_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.ETERNII1_VAL = decimal.TryParse(sqlite_datareader["ETERNII1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.ETERNII1_MONTO = decimal.TryParse(sqlite_datareader["ETERNII1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.FERREYC1_VAL = decimal.TryParse(sqlite_datareader["FERREYC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.FERREYC1_MONTO = decimal.TryParse(sqlite_datareader["FERREYC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.GRAMONC1_VAL = decimal.TryParse(sqlite_datareader["GRAMONC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.GRAMONC1_MONTO = decimal.TryParse(sqlite_datareader["GRAMONC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.IFS_VAL = decimal.TryParse(sqlite_datareader["IFS_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.IFS_MONTO = decimal.TryParse(sqlite_datareader["IFS_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.LAREDOC1_VAL = decimal.TryParse(sqlite_datareader["LAREDOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.LAREDOC1_MONTO = decimal.TryParse(sqlite_datareader["LAREDOC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.LUSURC1_VAL = decimal.TryParse(sqlite_datareader["LUSURC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.LUSURC1_MONTO = decimal.TryParse(sqlite_datareader["LUSURC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MILPOC1_VAL = decimal.TryParse(sqlite_datareader["MILPOC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MILPOC1_MONTO = decimal.TryParse(sqlite_datareader["MILPOC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MINSURI1_VAL = decimal.TryParse(sqlite_datareader["MINSURI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MINSURI1_MONTO = decimal.TryParse(sqlite_datareader["MINSURI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MOROCOI1_VAL = decimal.TryParse(sqlite_datareader["MOROCOI1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.MOROCOI1_MONTO = decimal.TryParse(sqlite_datareader["MOROCOI1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.RELAPAC1_VAL = decimal.TryParse(sqlite_datareader["RELAPAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.RELAPAC1_MONTO = decimal.TryParse(sqlite_datareader["RELAPAC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.SCOTIAC1_VAL = decimal.TryParse(sqlite_datareader["SCOTIAC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.SCOTIAC1_MONTO = decimal.TryParse(sqlite_datareader["SCOTIAC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.SIDERC1_VAL = decimal.TryParse(sqlite_datareader["SIDERC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.SIDERC1_MONTO = decimal.TryParse(sqlite_datareader["SIDERC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.TELEFBC1_VAL = decimal.TryParse(sqlite_datareader["TELEFBC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.TELEFBC1_MONTO = decimal.TryParse(sqlite_datareader["TELEFBC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.UNACEMC1_VAL = decimal.TryParse(sqlite_datareader["UNACEMC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.UNACEMC1_MONTO = decimal.TryParse(sqlite_datareader["UNACEMC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.VOLCABC1_VAL = decimal.TryParse(sqlite_datareader["VOLCABC1_VAL"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
-                                objData.VOLCABC1_MONTO = decimal.TryParse(sqlite_datareader["VOLCABC1_MONTO"].ToString(), out tmpvalue) ? tmpvalue : (decimal?)null;
+                                    objDataAccion.LIST_DATA_ACCION_DET.Add(objDataAccionDet);
+                                }
+                                objListDataAccion.Add(objDataAccion);
+                                
                             }
                             catch(Exception ex)
                             {
 
                             }
-                            objLisData.Add(objData);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-
             }
-
-            return objLisData;
+            return objListDataAccion;
         }
 
 
@@ -586,7 +572,7 @@ namespace DataAccess
 
                     foreach (var item in listEmpresa)
                     {
-                        sqlite_cmd.CommandText = @"UPDATE DATA SET " + item.nemonico + " = NULL;";
+                        sqlite_cmd.CommandText = @"UPDATE DATA SET " + item.nemonico + "_MONTO = NULL, " + item.nemonico + "_VAL = NULL, " + item.nemonico + "_VAL_MAX = NULL, " + item.nemonico + "_VAL_MIN = NULL;";
                         sqlite_cmd.ExecuteNonQuery();
                     }
 

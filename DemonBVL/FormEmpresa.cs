@@ -37,14 +37,11 @@ namespace DemonBVL
         private void FormEmpresa_Load(object sender, EventArgs e)
         {   
             objEmpresa = objEmpresaBL.obtenerEmpresa(nemonico);
-            //cbCategoria.SelectedItem = objEmpresa.categoria;
-
             cbCategoria.SelectedValue = objEmpresa.categoria;
-
-
             tbNemonico.Text = objEmpresa.nemonico;
             tbNombreEmp.Text = objEmpresa.nombre;
             empresaID = objEmpresa.id;
+            chkExcel.Checked = objEmpresa.excel == 1 ? true : false;
         }
 
         private void btnGuardar_Click(object sender, EventArgs e)
@@ -54,6 +51,7 @@ namespace DemonBVL
             objEmpresa.nemonico = tbNemonico.Text;
             objEmpresa.nombre = tbNombreEmp.Text;
             objEmpresa.id = empresaID;
+            objEmpresa.excel = chkExcel.Checked ? 1 : 0;
             objEmpresaBL.ModificarEmpresa(objEmpresa);
             objFormPrincipal.recargarObjetos();
             this.Close();

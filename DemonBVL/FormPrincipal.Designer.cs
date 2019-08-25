@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPrincipal));
             this.TabControl = new System.Windows.Forms.TabControl();
             this.PRINCIPAL = new System.Windows.Forms.TabPage();
             this.prgBar = new System.Windows.Forms.ProgressBar();
@@ -58,6 +59,8 @@
             this.label14 = new System.Windows.Forms.Label();
             this.CartesianChart2 = new LiveCharts.WinForms.CartesianChart();
             this.NEMONICOS = new System.Windows.Forms.TabPage();
+            this.label17 = new System.Windows.Forms.Label();
+            this.chkExcel = new System.Windows.Forms.CheckBox();
             this.lblEmpresas = new System.Windows.Forms.Label();
             this.linkCategoria = new System.Windows.Forms.LinkLabel();
             this.btnGuardar = new System.Windows.Forms.Button();
@@ -79,6 +82,7 @@
             this.dgData = new System.Windows.Forms.DataGridView();
             this.btnDescargar = new System.Windows.Forms.Button();
             this.btnEliminarData = new System.Windows.Forms.Button();
+            this.btnDescargar2 = new System.Windows.Forms.Button();
             this.TabControl.SuspendLayout();
             this.PRINCIPAL.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgOperaciones)).BeginInit();
@@ -101,7 +105,7 @@
             this.TabControl.Location = new System.Drawing.Point(39, 12);
             this.TabControl.Name = "TabControl";
             this.TabControl.SelectedIndex = 0;
-            this.TabControl.Size = new System.Drawing.Size(1000, 575);
+            this.TabControl.Size = new System.Drawing.Size(1046, 575);
             this.TabControl.TabIndex = 4;
             // 
             // PRINCIPAL
@@ -120,7 +124,7 @@
             this.PRINCIPAL.Location = new System.Drawing.Point(4, 22);
             this.PRINCIPAL.Name = "PRINCIPAL";
             this.PRINCIPAL.Padding = new System.Windows.Forms.Padding(3);
-            this.PRINCIPAL.Size = new System.Drawing.Size(992, 549);
+            this.PRINCIPAL.Size = new System.Drawing.Size(1038, 549);
             this.PRINCIPAL.TabIndex = 19;
             this.PRINCIPAL.Text = "PRINCIPAL";
             this.PRINCIPAL.UseVisualStyleBackColor = true;
@@ -136,7 +140,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(637, 100);
+            this.label10.Location = new System.Drawing.Point(670, 70);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(40, 13);
             this.label10.TabIndex = 9;
@@ -145,7 +149,7 @@
             // dtpFecha
             // 
             this.dtpFecha.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtpFecha.Location = new System.Drawing.Point(684, 96);
+            this.dtpFecha.Location = new System.Drawing.Point(717, 66);
             this.dtpFecha.Name = "dtpFecha";
             this.dtpFecha.Size = new System.Drawing.Size(98, 20);
             this.dtpFecha.TabIndex = 8;
@@ -154,7 +158,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(150, 126);
+            this.label9.Location = new System.Drawing.Point(183, 96);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(38, 13);
             this.label9.TabIndex = 7;
@@ -164,7 +168,7 @@
             // 
             this.dtHasta.CustomFormat = "dd-MM-yyyy";
             this.dtHasta.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtHasta.Location = new System.Drawing.Point(197, 121);
+            this.dtHasta.Location = new System.Drawing.Point(230, 91);
             this.dtHasta.Name = "dtHasta";
             this.dtHasta.Size = new System.Drawing.Size(98, 20);
             this.dtHasta.TabIndex = 6;
@@ -173,7 +177,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(150, 100);
+            this.label8.Location = new System.Drawing.Point(183, 70);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(41, 13);
             this.label8.TabIndex = 5;
@@ -183,7 +187,7 @@
             // 
             this.dtDesde.CustomFormat = "dd-MM-yyyy";
             this.dtDesde.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dtDesde.Location = new System.Drawing.Point(197, 95);
+            this.dtDesde.Location = new System.Drawing.Point(230, 65);
             this.dtDesde.Name = "dtDesde";
             this.dtDesde.Size = new System.Drawing.Size(98, 20);
             this.dtDesde.TabIndex = 4;
@@ -193,7 +197,7 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(614, 56);
+            this.label6.Location = new System.Drawing.Point(647, 26);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(184, 17);
             this.label6.TabIndex = 3;
@@ -203,7 +207,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(138, 56);
+            this.label5.Location = new System.Drawing.Point(171, 26);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(173, 17);
             this.label5.TabIndex = 2;
@@ -212,17 +216,17 @@
             // dgOperaciones
             // 
             this.dgOperaciones.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgOperaciones.Location = new System.Drawing.Point(513, 148);
+            this.dgOperaciones.Location = new System.Drawing.Point(536, 118);
             this.dgOperaciones.Name = "dgOperaciones";
-            this.dgOperaciones.Size = new System.Drawing.Size(430, 333);
+            this.dgOperaciones.Size = new System.Drawing.Size(465, 360);
             this.dgOperaciones.TabIndex = 1;
             // 
             // dgPromedio
             // 
             this.dgPromedio.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgPromedio.Location = new System.Drawing.Point(48, 148);
+            this.dgPromedio.Location = new System.Drawing.Point(48, 118);
             this.dgPromedio.Name = "dgPromedio";
-            this.dgPromedio.Size = new System.Drawing.Size(395, 333);
+            this.dgPromedio.Size = new System.Drawing.Size(439, 360);
             this.dgPromedio.TabIndex = 0;
             // 
             // COTIZACIONES
@@ -241,7 +245,7 @@
             this.COTIZACIONES.Location = new System.Drawing.Point(4, 22);
             this.COTIZACIONES.Name = "COTIZACIONES";
             this.COTIZACIONES.Padding = new System.Windows.Forms.Padding(3);
-            this.COTIZACIONES.Size = new System.Drawing.Size(992, 549);
+            this.COTIZACIONES.Size = new System.Drawing.Size(1038, 549);
             this.COTIZACIONES.TabIndex = 0;
             this.COTIZACIONES.Text = "COTIZACIONES";
             this.COTIZACIONES.UseVisualStyleBackColor = true;
@@ -339,7 +343,7 @@
             // 
             this.CartesianChart.Location = new System.Drawing.Point(36, 68);
             this.CartesianChart.Name = "CartesianChart";
-            this.CartesianChart.Size = new System.Drawing.Size(916, 407);
+            this.CartesianChart.Size = new System.Drawing.Size(962, 407);
             this.CartesianChart.TabIndex = 1;
             this.CartesianChart.Text = "CartesianChart";
             // 
@@ -351,7 +355,7 @@
             this.TRANSACCIONES.Location = new System.Drawing.Point(4, 22);
             this.TRANSACCIONES.Name = "TRANSACCIONES";
             this.TRANSACCIONES.Padding = new System.Windows.Forms.Padding(3);
-            this.TRANSACCIONES.Size = new System.Drawing.Size(992, 549);
+            this.TRANSACCIONES.Size = new System.Drawing.Size(1038, 549);
             this.TRANSACCIONES.TabIndex = 21;
             this.TRANSACCIONES.Text = "TRANSACCIONES";
             this.TRANSACCIONES.UseVisualStyleBackColor = true;
@@ -381,12 +385,14 @@
             // 
             this.CartesianChart2.Location = new System.Drawing.Point(36, 68);
             this.CartesianChart2.Name = "CartesianChart2";
-            this.CartesianChart2.Size = new System.Drawing.Size(916, 407);
+            this.CartesianChart2.Size = new System.Drawing.Size(966, 407);
             this.CartesianChart2.TabIndex = 2;
             this.CartesianChart2.Text = "CartesianChart2";
             // 
             // NEMONICOS
             // 
+            this.NEMONICOS.Controls.Add(this.label17);
+            this.NEMONICOS.Controls.Add(this.chkExcel);
             this.NEMONICOS.Controls.Add(this.lblEmpresas);
             this.NEMONICOS.Controls.Add(this.linkCategoria);
             this.NEMONICOS.Controls.Add(this.btnGuardar);
@@ -400,10 +406,28 @@
             this.NEMONICOS.Location = new System.Drawing.Point(4, 22);
             this.NEMONICOS.Name = "NEMONICOS";
             this.NEMONICOS.Padding = new System.Windows.Forms.Padding(3);
-            this.NEMONICOS.Size = new System.Drawing.Size(992, 549);
+            this.NEMONICOS.Size = new System.Drawing.Size(1038, 549);
             this.NEMONICOS.TabIndex = 20;
             this.NEMONICOS.Text = "NEMONICOS";
             this.NEMONICOS.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(657, 219);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(36, 13);
+            this.label17.TabIndex = 11;
+            this.label17.Text = "Excel:";
+            // 
+            // chkExcel
+            // 
+            this.chkExcel.AutoSize = true;
+            this.chkExcel.Location = new System.Drawing.Point(717, 219);
+            this.chkExcel.Name = "chkExcel";
+            this.chkExcel.Size = new System.Drawing.Size(15, 14);
+            this.chkExcel.TabIndex = 10;
+            this.chkExcel.UseVisualStyleBackColor = true;
             // 
             // lblEmpresas
             // 
@@ -417,7 +441,7 @@
             // linkCategoria
             // 
             this.linkCategoria.AutoSize = true;
-            this.linkCategoria.Location = new System.Drawing.Point(861, 67);
+            this.linkCategoria.Location = new System.Drawing.Point(905, 67);
             this.linkCategoria.Name = "linkCategoria";
             this.linkCategoria.Size = new System.Drawing.Size(93, 13);
             this.linkCategoria.TabIndex = 8;
@@ -427,7 +451,7 @@
             // 
             // btnGuardar
             // 
-            this.btnGuardar.Location = new System.Drawing.Point(879, 219);
+            this.btnGuardar.Location = new System.Drawing.Point(923, 254);
             this.btnGuardar.Name = "btnGuardar";
             this.btnGuardar.Size = new System.Drawing.Size(75, 23);
             this.btnGuardar.TabIndex = 7;
@@ -439,7 +463,7 @@
             // 
             this.cbCategoria.DisplayMember = "nombre";
             this.cbCategoria.FormattingEnabled = true;
-            this.cbCategoria.Location = new System.Drawing.Point(673, 59);
+            this.cbCategoria.Location = new System.Drawing.Point(717, 59);
             this.cbCategoria.Name = "cbCategoria";
             this.cbCategoria.Size = new System.Drawing.Size(182, 21);
             this.cbCategoria.TabIndex = 6;
@@ -448,7 +472,7 @@
             // tbNombreEmp
             // 
             this.tbNombreEmp.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tbNombreEmp.Location = new System.Drawing.Point(673, 164);
+            this.tbNombreEmp.Location = new System.Drawing.Point(717, 164);
             this.tbNombreEmp.Name = "tbNombreEmp";
             this.tbNombreEmp.Size = new System.Drawing.Size(281, 20);
             this.tbNombreEmp.TabIndex = 5;
@@ -456,7 +480,7 @@
             // tbNemonico
             // 
             this.tbNemonico.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
-            this.tbNemonico.Location = new System.Drawing.Point(673, 111);
+            this.tbNemonico.Location = new System.Drawing.Point(717, 111);
             this.tbNemonico.Name = "tbNemonico";
             this.tbNemonico.Size = new System.Drawing.Size(182, 20);
             this.tbNemonico.TabIndex = 4;
@@ -464,7 +488,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(602, 167);
+            this.label13.Location = new System.Drawing.Point(646, 167);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(47, 13);
             this.label13.TabIndex = 3;
@@ -473,7 +497,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(592, 114);
+            this.label12.Location = new System.Drawing.Point(636, 114);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(58, 13);
             this.label12.TabIndex = 2;
@@ -482,7 +506,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(592, 62);
+            this.label11.Location = new System.Drawing.Point(636, 62);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(57, 13);
             this.label11.TabIndex = 1;
@@ -493,7 +517,7 @@
             this.dgNemonico.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgNemonico.Location = new System.Drawing.Point(43, 29);
             this.dgNemonico.Name = "dgNemonico";
-            this.dgNemonico.Size = new System.Drawing.Size(527, 447);
+            this.dgNemonico.Size = new System.Drawing.Size(568, 447);
             this.dgNemonico.TabIndex = 0;
             this.dgNemonico.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgNemonico_CellClick);
             // 
@@ -510,14 +534,14 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(992, 549);
+            this.tabPage1.Size = new System.Drawing.Size(1038, 549);
             this.tabPage1.TabIndex = 22;
             this.tabPage1.Text = "DATA";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // btnToExcel
             // 
-            this.btnToExcel.Location = new System.Drawing.Point(875, 27);
+            this.btnToExcel.Location = new System.Drawing.Point(915, 29);
             this.btnToExcel.Name = "btnToExcel";
             this.btnToExcel.Size = new System.Drawing.Size(90, 23);
             this.btnToExcel.TabIndex = 7;
@@ -585,22 +609,22 @@
             // 
             this.dgData.Location = new System.Drawing.Point(28, 64);
             this.dgData.Name = "dgData";
-            this.dgData.Size = new System.Drawing.Size(937, 459);
+            this.dgData.Size = new System.Drawing.Size(977, 459);
             this.dgData.TabIndex = 0;
             // 
             // btnDescargar
             // 
-            this.btnDescargar.Location = new System.Drawing.Point(28, 593);
+            this.btnDescargar.Location = new System.Drawing.Point(42, 593);
             this.btnDescargar.Name = "btnDescargar";
-            this.btnDescargar.Size = new System.Drawing.Size(75, 23);
+            this.btnDescargar.Size = new System.Drawing.Size(89, 23);
             this.btnDescargar.TabIndex = 3;
-            this.btnDescargar.Text = "Descargar!!";
+            this.btnDescargar.Text = "Descargar V1";
             this.btnDescargar.UseVisualStyleBackColor = true;
             this.btnDescargar.Click += new System.EventHandler(this.btnDescargar_Click);
             // 
             // btnEliminarData
             // 
-            this.btnEliminarData.Location = new System.Drawing.Point(118, 593);
+            this.btnEliminarData.Location = new System.Drawing.Point(243, 593);
             this.btnEliminarData.Name = "btnEliminarData";
             this.btnEliminarData.Size = new System.Drawing.Size(96, 23);
             this.btnEliminarData.TabIndex = 11;
@@ -608,14 +632,26 @@
             this.btnEliminarData.UseVisualStyleBackColor = true;
             this.btnEliminarData.Click += new System.EventHandler(this.btnEliminarData_Click);
             // 
+            // btnDescargar2
+            // 
+            this.btnDescargar2.Location = new System.Drawing.Point(143, 593);
+            this.btnDescargar2.Name = "btnDescargar2";
+            this.btnDescargar2.Size = new System.Drawing.Size(89, 23);
+            this.btnDescargar2.TabIndex = 12;
+            this.btnDescargar2.Text = "Descargar V2";
+            this.btnDescargar2.UseVisualStyleBackColor = true;
+            this.btnDescargar2.Click += new System.EventHandler(this.btnDescargar2_Click);
+            // 
             // FormPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1084, 630);
+            this.ClientSize = new System.Drawing.Size(1111, 630);
+            this.Controls.Add(this.btnDescargar2);
             this.Controls.Add(this.btnEliminarData);
             this.Controls.Add(this.TabControl);
             this.Controls.Add(this.btnDescargar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FormPrincipal";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BVL - HUZA";
@@ -692,6 +728,9 @@
         private System.Windows.Forms.Button btnEliminarData;
         private System.Windows.Forms.Button btnLlenarReporte;
         private System.Windows.Forms.Button btnToExcel;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.CheckBox chkExcel;
+        private System.Windows.Forms.Button btnDescargar2;
     }
 }
 

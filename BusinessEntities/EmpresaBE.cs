@@ -13,5 +13,6 @@ namespace BusinessEntities
         public string nombre { get; set; }
         public string categoria { get; set; }
 
+        public int excel { get; set; }
     }
 }

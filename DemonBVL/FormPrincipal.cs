@@ -39,6 +39,7 @@ namespace DemonBVL
         {
             try
             {
+                System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
                 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("EN-US");
                 dtDesde.Value =DateTime.ParseExact(ConfigurationManager.AppSettings["FechaInicio"], "yyyy-MM-dd", new CultureInfo("en-US"),DateTimeStyles.None);
 
@@ -65,7 +66,13 @@ namespace DemonBVL
 
         private void btnDescargar_Click(object sender, EventArgs e)
         {
-           Descargar2();
+            Descargar1();
+        }
+
+
+        private void btnDescargar2_Click(object sender, EventArgs e)
+        {
+            Descargar2();
         }
 
         public void Descargar1()
@@ -130,6 +137,12 @@ namespace DemonBVL
                             if (row.SelectNodes("td[3]")[0].InnerText != "" && row.SelectNodes("td[3]")[0].InnerText != "&nbsp;")
                                 objAccion.valor = Convert.ToDecimal(row.SelectNodes("td[3]")[0].InnerText.Replace(",", ""));
 
+                            if (row.SelectNodes("td[4]")[0].InnerText != "" && row.SelectNodes("td[4]")[0].InnerText != "&nbsp;")
+                                objAccion.maximo = Convert.ToDecimal(row.SelectNodes("td[4]")[0].InnerText.Replace(",", ""));
+
+                            if (row.SelectNodes("td[5]")[0].InnerText != "" && row.SelectNodes("td[5]")[0].InnerText != "&nbsp;")
+                                objAccion.minimo = Convert.ToDecimal(row.SelectNodes("td[5]")[0].InnerText.Replace(",", ""));
+
                             if (row.SelectNodes("td[7]")[0].InnerText != "" && row.SelectNodes("td[7]")[0].InnerText != "&nbsp;")
                                 objAccion.num_acciones = Convert.ToDecimal(row.SelectNodes("td[7]")[0].InnerText.Replace(",", ""));
 
@@ -179,7 +192,7 @@ namespace DemonBVL
                 {
                     prgBar.Increment(Convert.ToInt32(partProgress));
                     prgBar.Refresh();
-                    ultimaFecha = objAccionBL.ultimaFecha(objEmpresa.nemonico);
+                    ultimaFecha =objAccionBL.ultimaFecha(objEmpresa.nemonico); 
                     if (DateTime.Now.Date > ultimaFecha.Date)
                     {
                         if (ultimaFecha.Date > Convert.ToDateTime(fechaInicio).Date)
@@ -215,8 +228,14 @@ namespace DemonBVL
                         if (row.valVol != "")
                             objAccion.num_acciones = Convert.ToDecimal(row.valVol.Replace(",", ""));
 
-                        if (row.valAmtSol != "")
+                        if (row.valAmtSol != "" )
                             objAccion.monto_negociado = Convert.ToDecimal(row.valAmtSol.Replace(",", ""));
+
+                        if (row.valHighs != "" && row.valHighs != null)
+                            objAccion.maximo = Convert.ToDecimal(row.valHighs.Replace(",", ""));
+
+                        if (row.valLows != "" && row.valLows != null)
+                            objAccion.minimo = Convert.ToDecimal(row.valLows.Replace(",", ""));
 
                         objListAccion.Add(objAccion);
 
@@ -260,6 +279,7 @@ namespace DemonBVL
             objEmpresa.categoria = cbCategoria.Text.ToString();
             objEmpresa.nombre = tbNombreEmp.Text;
             objEmpresa.nemonico = tbNemonico.Text;
+            objEmpresa.excel = chkExcel.Checked ? 1 : 0;
             objEmpresaBL.InsertarEmpresa(objEmpresa);
 
             List<EmpresaBE> objListEmpresa = new List<EmpresaBE>();
@@ -290,14 +310,14 @@ namespace DemonBVL
                 editarButtonColumn.Text = "Editar";
                 editarButtonColumn.UseColumnTextForButtonValue = true;
 
-                dgNemonico.Columns.Insert(4, editarButtonColumn);
+                dgNemonico.Columns.Insert(5, editarButtonColumn);
 
                 DataGridViewButtonColumn eliminarButtonColumn = new DataGridViewButtonColumn();
                 eliminarButtonColumn.Name = "eliminar_column";
                 eliminarButtonColumn.Text = "Eliminar";
                 eliminarButtonColumn.UseColumnTextForButtonValue = true;
 
-                dgNemonico.Columns.Insert(5, eliminarButtonColumn);
+                dgNemonico.Columns.Insert(6, eliminarButtonColumn);
                 cambiarHeader();
             }
             
@@ -314,8 +334,9 @@ namespace DemonBVL
             dgNemonico.Columns[1].HeaderText = "NEMONICO";
             dgNemonico.Columns[2].HeaderText = "NOMBRE";
             dgNemonico.Columns[3].HeaderText = "CATEGORIA";
-            dgNemonico.Columns[4].HeaderText = "";
+            dgNemonico.Columns[4].HeaderText = "EXCEL";
             dgNemonico.Columns[5].HeaderText = "";
+            dgNemonico.Columns[6].HeaderText = "";
 
             dgNemonico.Columns[0].Width = 30;
             dgNemonico.Columns[1].Width = 80;
@@ -323,6 +344,7 @@ namespace DemonBVL
             dgNemonico.Columns[3].Width = 100;
             dgNemonico.Columns[4].Width = 50;
             dgNemonico.Columns[5].Width = 50;
+            dgNemonico.Columns[6].Width = 50;
         }
 
         private void dgNemonico_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -462,7 +484,7 @@ namespace DemonBVL
                 tbMax.Text = objAccion.maximo.ToString();
                 tbMin.Text = objAccion.minimo.ToString();
                 
-                tbProm.Text = objAccionBL.promedioNemonico(cbNemonico.SelectedValue.ToString(), "2016-01-01", DateTime.Now.ToShortDateString()).ToString();
+                tbProm.Text = objAccionBL.promedioNemonico(cbNemonico.SelectedValue.ToString(), ConfigurationManager.AppSettings["FechaInicio"], DateTime.Now.ToShortDateString()).ToString();
 
             }
 
@@ -561,13 +583,6 @@ namespace DemonBVL
 
         private void btnToExcel_Click(object sender, EventArgs e)
         {
-            //SaveFileDialog sfd = new SaveFileDialog();
-            //sfd.Filter = "Excel Documents (*.xls)|*.xls";
-            //sfd.FileName = "export.xls";
-            //if (sfd.ShowDialog() == DialogResult.OK)
-            //{
-            //    ExportarExcel(dgData, sfd.FileName);
-            //}
             ExportarExcelDet();
         }
 
@@ -602,217 +617,134 @@ namespace DemonBVL
         {
             try
             {
-
+                EmpresaBL objEmpresaBL = new EmpresaBL();
             
             Microsoft.Office.Interop.Excel.Application xlApp;
             Microsoft.Office.Interop.Excel.Workbook xlWorkBook;
             Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet;
+            Microsoft.Office.Interop.Excel.Worksheet xlWorkSheet2;
             object misValue = System.Reflection.Missing.Value;
-            Microsoft.Office.Interop.Excel.Range chartRange;
             string path = ConfigurationManager.AppSettings["PathExcel"];
             FileInfo fi = new FileInfo(@path);
             if (!fi.Exists)
             {
                 xlApp = new Microsoft.Office.Interop.Excel.Application();
                 xlWorkBook = xlApp.Workbooks.Add(misValue);
-                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+                xlWorkBook.Sheets.Add();
+                xlWorkSheet2 = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Worksheets.get_Item(2);
+
+                xlWorkSheet.Name = "COTIZACIONES";
+                xlWorkSheet2.Name = "M. NEGOCIADO";
             }
             else
             {
                 xlApp = new Microsoft.Office.Interop.Excel.Application();
                 xlWorkBook = xlApp.Workbooks.Open(@path);
-                xlWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Sheets[1];
-            }
-                
-                //add data 
-                xlWorkSheet.Cells[1, 1] = "";
-                xlWorkSheet.Cells[1, 2] = "AIHC1";
-                xlWorkSheet.Cells[2, 1] = "FECHA";
-                xlWorkSheet.Cells[2, 2] = "VALOR";
-                xlWorkSheet.Cells[2, 3] = "M. NEG";
-                xlWorkSheet.Cells[1, 4] = "ALICORC1";
-                xlWorkSheet.Cells[2, 4] = "VALOR";
-                xlWorkSheet.Cells[2, 5] = "M. NEG";
-                xlWorkSheet.Cells[1, 6] = "BACKUBC1";
-                xlWorkSheet.Cells[2, 6] = "VALOR";
-                xlWorkSheet.Cells[2, 7] = "M. NEG";
-                xlWorkSheet.Cells[1, 8] = "BROCALC1";
-                xlWorkSheet.Cells[2, 8] = "VALOR";
-                xlWorkSheet.Cells[2, 9] = "M. NEG";
-                xlWorkSheet.Cells[1, 10] = "BROCALI1";
-                xlWorkSheet.Cells[2, 10] = "VALOR";
-                xlWorkSheet.Cells[2, 11] = "M. NEG";
-                xlWorkSheet.Cells[1, 12] = "BUENAVC1";
-                xlWorkSheet.Cells[2, 12] = "VALOR";
-                xlWorkSheet.Cells[2, 13] = "M. NEG";
-                xlWorkSheet.Cells[1, 14] = "CASAGRC1";
-                xlWorkSheet.Cells[2, 14] = "VALOR";
-                xlWorkSheet.Cells[2, 15] = "M. NEG";
-                xlWorkSheet.Cells[1, 16] = "CONTINC1";
-                xlWorkSheet.Cells[2, 16] = "VALOR";
-                xlWorkSheet.Cells[2, 17] = "M. NEG";
-                xlWorkSheet.Cells[1, 18] = "CORAREI1";
-                xlWorkSheet.Cells[2, 18] = "VALOR";
-                xlWorkSheet.Cells[2, 19] = "M. NEG";
-                xlWorkSheet.Cells[1, 20] = "CPACASC1";
-                xlWorkSheet.Cells[2, 20] = "VALOR";
-                xlWorkSheet.Cells[2, 21] = "M. NEG";
-                xlWorkSheet.Cells[1, 22] = "CREDITC1";
-                xlWorkSheet.Cells[2, 22] = "VALOR";
-                xlWorkSheet.Cells[2, 23] = "M. NEG";
-                xlWorkSheet.Cells[1, 24] = "CVERDEC1";
-                xlWorkSheet.Cells[2, 24] = "VALOR";
-                xlWorkSheet.Cells[2, 25] = "M. NEG";
-                xlWorkSheet.Cells[1, 26] = "DNT";
-                xlWorkSheet.Cells[2, 26] = "VALOR";
-                xlWorkSheet.Cells[2, 27] = "M. NEG";
-                xlWorkSheet.Cells[1, 28] = "ETERNII1";
-                xlWorkSheet.Cells[2, 28] = "VALOR";
-                xlWorkSheet.Cells[2, 29] = "M. NEG";
-                xlWorkSheet.Cells[1, 30] = "FERREYC1";
-                xlWorkSheet.Cells[2, 30] = "VALOR";
-                xlWorkSheet.Cells[2, 31] = "M. NEG";
-                xlWorkSheet.Cells[1, 32] = "GRAMONC1";
-                xlWorkSheet.Cells[2, 32] = "VALOR";
-                xlWorkSheet.Cells[2, 33] = "M. NEG";
-                xlWorkSheet.Cells[1, 34] = "IFS";
-                xlWorkSheet.Cells[2, 34] = "VALOR";
-                xlWorkSheet.Cells[2, 35] = "M. NEG";
-                xlWorkSheet.Cells[1, 36] = "LAREDOC1";
-                xlWorkSheet.Cells[2, 36] = "VALOR";
-                xlWorkSheet.Cells[2, 37] = "M. NEG";
-                xlWorkSheet.Cells[1, 38] = "LUSURC1";
-                xlWorkSheet.Cells[2, 38] = "VALOR";
-                xlWorkSheet.Cells[2, 39] = "M. NEG";
-                xlWorkSheet.Cells[1, 40] = "MILPOC1";
-                xlWorkSheet.Cells[2, 40] = "VALOR";
-                xlWorkSheet.Cells[2, 41] = "M. NEG";
-                xlWorkSheet.Cells[1, 42] = "MINSURI1";
-                xlWorkSheet.Cells[2, 42] = "VALOR";
-                xlWorkSheet.Cells[2, 43] = "M. NEG";
-                xlWorkSheet.Cells[1, 44] = "MOROCOI1";
-                xlWorkSheet.Cells[2, 44] = "VALOR";
-                xlWorkSheet.Cells[2, 45] = "M. NEG";
-                xlWorkSheet.Cells[1, 46] = "RELAPAC1";
-                xlWorkSheet.Cells[2, 46] = "VALOR";
-                xlWorkSheet.Cells[2, 47] = "M. NEG";
-                xlWorkSheet.Cells[1, 48] = "SCOTIAC1";
-                xlWorkSheet.Cells[2, 48] = "VALOR";
-                xlWorkSheet.Cells[2, 49] = "M. NEG";
-                xlWorkSheet.Cells[1, 50] = "SIDERC1";
-                xlWorkSheet.Cells[2, 50] = "VALOR";
-                xlWorkSheet.Cells[2, 51] = "M. NEG";
-                xlWorkSheet.Cells[1, 52] = "TELEFBC1";
-                xlWorkSheet.Cells[2, 52] = "VALOR";
-                xlWorkSheet.Cells[2, 53] = "M. NEG";
-                xlWorkSheet.Cells[1, 54] = "UNACEMC1";
-                xlWorkSheet.Cells[2, 54] = "VALOR";
-                xlWorkSheet.Cells[2, 55] = "M. NEG";
-                xlWorkSheet.Cells[1, 56] = "VOLCABC1";
-                xlWorkSheet.Cells[2, 56] = "VALOR";
-                xlWorkSheet.Cells[2, 57] = "M. NEG";
+                var ws1 = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Sheets[1];
+                var ws2 = (Microsoft.Office.Interop.Excel.Worksheet)xlWorkBook.Sheets[2];
 
+
+
+                if (ws1.Name == "COTIZACIONES")
+                {
+                    xlWorkSheet = ws1;
+                    xlWorkSheet2 = ws2;
+                }
+                else
+                {
+                    xlWorkSheet = ws2;
+                    xlWorkSheet2 = ws1;
+                }
+            }
+
+                var objListEmpresas = objEmpresaBL.listarEmpresas();
+                objListEmpresas = objListEmpresas.Where(x => x.excel == 1).ToList().OrderBy(x=>x.nemonico).ToList();
+
+                xlWorkSheet.Cells[1, 1] = "";
+                xlWorkSheet.Cells[2, 1] = "FECHA";
+
+                int x1 = 2;
+                int y1 = 1;
+                int x2 = 2;
+                int y2 = 2;                
+
+                foreach (var item in objListEmpresas)
+                {
+                    xlWorkSheet.Cells[y1,x1] = item.nemonico;
+                    xlWorkSheet.Cells[y2, x2] = "CIERRE";
+                    x2++;
+                    xlWorkSheet.Cells[y2, x2] = "MIN";
+                    x2++;
+                    xlWorkSheet.Cells[y2, x2] = "MAX";
+                    x2++;
+                    x1 = x1 + 3;
+                } 
+
+                //add data 
 
                 AccionBL objAccion = new AccionBL();
 
-                var listaDatos = objAccion.GenerateDataDet(dtDesdeData.Value.ToString("yyyy-MM-dd"), dtHastaData.Value.ToString("yyyy-MM-dd"));
+                var objDatos = objAccion.GenerateDataDet(dtDesdeData.Value.ToString("yyyy-MM-dd"), dtHastaData.Value.ToString("yyyy-MM-dd"));
 
                 int i = 3;
-                foreach (var item in listaDatos)
+                int j = 1;                
+                
+                foreach(var item in objDatos)
                 {
-                    xlWorkSheet.Cells[i, 1] = item.FECHA;
-                    xlWorkSheet.Cells[i, 2] = item.AIHC1_VAL;
-                    xlWorkSheet.Cells[i, 3] = item.AIHC1_MONTO;
-                    xlWorkSheet.Cells[i, 4] = item.ALICORC1_VAL;
-                    xlWorkSheet.Cells[i, 5] = item.ALICORC1_MONTO;
-                    xlWorkSheet.Cells[i, 6] = item.BACKUBC1_VAL;
-                    xlWorkSheet.Cells[i, 7] = item.BROCALC1_MONTO;
-                    xlWorkSheet.Cells[i, 8] = item.BROCALC1_VAL;
-                    xlWorkSheet.Cells[i, 9] = item.BROCALC1_MONTO;
-                    xlWorkSheet.Cells[i, 10] = item.BROCALI1_VAL;
-                    xlWorkSheet.Cells[i, 11] = item.BROCALI1_MONTO;
-                    xlWorkSheet.Cells[i, 12] = item.BUENAVC1_VAL;
-                    xlWorkSheet.Cells[i, 13] = item.BUENAVC1_MONTO;
-                    xlWorkSheet.Cells[i, 14] = item.CASAGRC1_VAL;
-                    xlWorkSheet.Cells[i, 15] = item.CASAGRC1_MONTO;
-                    xlWorkSheet.Cells[i, 16] = item.CONTINC1_VAL;
-                    xlWorkSheet.Cells[i, 17] = item.CONTINC1_MONTO;
-                    xlWorkSheet.Cells[i, 18] = item.CORAREI1_VAL;
-                    xlWorkSheet.Cells[i, 19] = item.CORAREI1_MONTO;
-                    xlWorkSheet.Cells[i, 20] = item.CPACASC1_VAL;
-                    xlWorkSheet.Cells[i, 21] = item.CPACASC1_MONTO;
-                    xlWorkSheet.Cells[i, 22] = item.CREDITC1_VAL;
-                    xlWorkSheet.Cells[i, 23] = item.CREDITC1_MONTO;
-                    xlWorkSheet.Cells[i, 24] = item.CVERDEC1_VAL;
-                    xlWorkSheet.Cells[i, 25] = item.CVERDEC1_MONTO;
-                    xlWorkSheet.Cells[i, 26] = item.DNT_VAL;
-                    xlWorkSheet.Cells[i, 27] = item.DNT_MONTO;
-                    xlWorkSheet.Cells[i, 28] = item.ETERNII1_VAL;
-                    xlWorkSheet.Cells[i, 29] = item.ETERNII1_MONTO;
-                    xlWorkSheet.Cells[i, 30] = item.FERREYC1_VAL;
-                    xlWorkSheet.Cells[i, 31] = item.FERREYC1_MONTO;
-                    xlWorkSheet.Cells[i, 32] = item.GRAMONC1_VAL;
-                    xlWorkSheet.Cells[i, 33] = item.GRAMONC1_MONTO;
-                    xlWorkSheet.Cells[i, 34] = item.IFS_VAL;
-                    xlWorkSheet.Cells[i, 35] = item.IFS_MONTO;
-                    xlWorkSheet.Cells[i, 36] = item.LAREDOC1_VAL;
-                    xlWorkSheet.Cells[i, 37] = item.LAREDOC1_MONTO;
-                    xlWorkSheet.Cells[i, 38] = item.LUSURC1_VAL;
-                    xlWorkSheet.Cells[i, 39] = item.LUSURC1_MONTO;
-                    xlWorkSheet.Cells[i, 40] = item.MILPOC1_VAL;
-                    xlWorkSheet.Cells[i, 41] = item.MILPOC1_MONTO;
-                    xlWorkSheet.Cells[i, 42] = item.MINSURI1_VAL;
-                    xlWorkSheet.Cells[i, 43] = item.MINSURI1_MONTO;
-                    xlWorkSheet.Cells[i, 44] = item.MOROCOI1_VAL;
-                    xlWorkSheet.Cells[i, 45] = item.MOROCOI1_MONTO;
-                    xlWorkSheet.Cells[i, 46] = item.RELAPAC1_VAL;
-                    xlWorkSheet.Cells[i, 47] = item.RELAPAC1_MONTO;
-                    xlWorkSheet.Cells[i, 48] = item.SCOTIAC1_VAL;
-                    xlWorkSheet.Cells[i, 49] = item.SCOTIAC1_MONTO;
-                    xlWorkSheet.Cells[i, 50] = item.SIDERC1_VAL;
-                    xlWorkSheet.Cells[i, 51] = item.SIDERC1_MONTO;
-                    xlWorkSheet.Cells[i, 52] = item.TELEFBC1_VAL;
-                    xlWorkSheet.Cells[i, 53] = item.TELEFBC1_MONTO;
-                    xlWorkSheet.Cells[i, 54] = item.UNACEMC1_VAL;
-                    xlWorkSheet.Cells[i, 55] = item.VOLCABC1_MONTO;
-                    xlWorkSheet.Cells[i, 56] = item.VOLCABC1_VAL;
-                    xlWorkSheet.Cells[i, 57] = item.VOLCABC1_MONTO;
-                    i++;
+                    xlWorkSheet.Cells[i, j++] = item.FECHA;
 
+                    foreach (var item2 in item.LIST_DATA_ACCION_DET)
+                    {
+                        xlWorkSheet.Cells[i, j++] = item2.CIERRE;
+                        xlWorkSheet.Cells[i, j++] = item2.MIN;
+                        xlWorkSheet.Cells[i, j++] = item2.MAX;                                                
+                    }
+                    i++;
+                    j = 1;
                 }
 
-                xlWorkSheet.get_Range("b1", "c1").Merge(true);
-                xlWorkSheet.get_Range("d1", "e1").Merge(true);
-                xlWorkSheet.get_Range("f1", "g1").Merge(true);
-                xlWorkSheet.get_Range("h1", "i1").Merge(true);
-                xlWorkSheet.get_Range("j1", "k1").Merge(true);
-                xlWorkSheet.get_Range("l1", "m1").Merge(true);
-                xlWorkSheet.get_Range("n1", "o1").Merge(true);
-                xlWorkSheet.get_Range("p1", "q1").Merge(true);
-                xlWorkSheet.get_Range("r1", "s1").Merge(true);
-                xlWorkSheet.get_Range("t1", "u1").Merge(true);
-                xlWorkSheet.get_Range("v1", "w1").Merge(true);
-                xlWorkSheet.get_Range("x1", "y1").Merge(true);
-                xlWorkSheet.get_Range("z1", "aa1").Merge(true);
-                xlWorkSheet.get_Range("ab1", "ac1").Merge(true);
-                xlWorkSheet.get_Range("ad1", "ae1").Merge(true);
-                xlWorkSheet.get_Range("af1", "ag1").Merge(true);
-                xlWorkSheet.get_Range("ah1", "ai1").Merge(true);
-                xlWorkSheet.get_Range("aj1", "ak1").Merge(true);
-                xlWorkSheet.get_Range("al1", "am1").Merge(true);
-                xlWorkSheet.get_Range("an1", "ao1").Merge(true);
-                xlWorkSheet.get_Range("ap1", "aq1").Merge(true);
-                xlWorkSheet.get_Range("ar1", "as1").Merge(true);
-                xlWorkSheet.get_Range("at1", "au1").Merge(true);
-                xlWorkSheet.get_Range("av1", "aw1").Merge(true);
-                xlWorkSheet.get_Range("ax1", "ay1").Merge(true);
-                xlWorkSheet.get_Range("az1", "ba1").Merge(true);
-                xlWorkSheet.get_Range("bb1", "bc1").Merge(true);
-                xlWorkSheet.get_Range("bd1", "be1").Merge(true);
+                int b = 1;
+                for (int r = 0; r < objListEmpresas.Count; r++)
+                {
+                    string y = ExcelColumnIndexToName(b);
+                    b = b + 2;
+                    string x = ExcelColumnIndexToName(b);
+                    xlWorkSheet.get_Range(y+"1", x+"1").Merge(true);
+                    b++;
+                }
 
-                xlWorkSheet.get_Range("a1", "be2000").HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
-            
-            if (!fi.Exists)
+                xlWorkSheet.get_Range("a1", "y2000").HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+                xlWorkSheet.get_Range("a1", ExcelColumnIndexToName(objListEmpresas.Count * 3).ToString() + "2").Font.Bold = true;
+                xlWorkSheet.get_Range("a1", ExcelColumnIndexToName(objListEmpresas.Count * 3).ToString() + "2").Interior.Color = Color.Yellow;
+                
+                xlWorkSheet2.Cells[1, 1] = "FECHA";
+
+                j = 2;
+                foreach (var item in objListEmpresas)
+                {
+                    xlWorkSheet2.Cells[1, j++] = item.nemonico;
+                }
+                
+                i = 2;
+                j = 1;
+                foreach (var item in objDatos)
+                {
+                    xlWorkSheet2.Cells[i, j++] = item.FECHA;
+                    foreach (var item2 in item.LIST_DATA_ACCION_DET)
+                    {                       
+                        xlWorkSheet2.Cells[i, j++] = item2.MONTO;                        
+                    }
+                    j = 1;
+                    i++;
+                }
+                
+                xlWorkSheet2.get_Range("a1", ExcelColumnIndexToName(objListEmpresas.Count + 1).ToString()+ "1").HorizontalAlignment = Microsoft.Office.Interop.Excel.XlHAlign.xlHAlignCenter;
+                xlWorkSheet2.get_Range("a1", ExcelColumnIndexToName(objListEmpresas.Count + 1).ToString()+ "1").Font.Bold = true;
+                xlWorkSheet2.get_Range("a1", ExcelColumnIndexToName(objListEmpresas.Count + 1).ToString()+ "1").Interior.Color = Color.Yellow;
+
+
+                if (!fi.Exists)
             {
                 xlWorkBook.SaveAs(@path, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
             }
@@ -830,5 +762,20 @@ namespace DemonBVL
             }
         }
 
+        private string ExcelColumnIndexToName(int Index)
+        {
+            string range = string.Empty;
+            if (Index < 0) return range;
+            int a = 26;
+            int x = (int)Math.Floor(Math.Log((Index) * (a - 1) / a + 1, a));
+            Index -= (int)(Math.Pow(a, x) - 1) * a / (a - 1);
+            for (int i = x + 1; Index + i > 0; i--)
+            {
+                range = ((char)(65 + Index % a)).ToString() + range;
+                Index /= a;
+            }
+            return range;
         }
+
+    }
 }

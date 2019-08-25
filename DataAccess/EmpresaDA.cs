@@ -27,7 +27,8 @@ namespace DataAccess
                                            ID INTEGER PRIMARY KEY AUTOINCREMENT,
                                            CATEGORIA      VARCHAR,
                                            NEMONICO       VARCHAR,
-                                           NOMBRE         VARCHAR
+                                           NOMBRE         VARCHAR,
+                                           EXCEL          VARCHAR
                                         );";
                     sqlite_cmd.ExecuteNonQuery();
                 }
@@ -87,7 +88,7 @@ namespace DataAccess
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = "INSERT INTO EMPRESA (CATEGORIA,NEMONICO,NOMBRE) VALUES ('" + objEmpresa.categoria + "','" + objEmpresa.nemonico + "','" + objEmpresa.nombre + "')";
+                    sqlite_cmd.CommandText = "INSERT INTO EMPRESA (CATEGORIA,NEMONICO,NOMBRE,EXCEL) VALUES ('" + objEmpresa.categoria + "','" + objEmpresa.nemonico + "','" + objEmpresa.nombre + "'," + objEmpresa.excel.ToString() + ")";
                     sqlite_cmd.ExecuteNonQuery();
                 }
             }
@@ -107,7 +108,7 @@ namespace DataAccess
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = "UPDATE EMPRESA SET CATEGORIA = '" + objEmpresa.categoria + "', NEMONICO = '" + objEmpresa.nemonico + "', NOMBRE = '" + objEmpresa.nombre + "' WHERE ID = " + objEmpresa.id.ToString();
+                    sqlite_cmd.CommandText = "UPDATE EMPRESA SET CATEGORIA = '" + objEmpresa.categoria + "', NEMONICO = '" + objEmpresa.nemonico + "', NOMBRE = '" + objEmpresa.nombre + "', EXCEL = " + objEmpresa.excel.ToString() + " WHERE ID = " + objEmpresa.id.ToString();
                     sqlite_cmd.ExecuteNonQuery();
                 }
             }
@@ -168,6 +169,7 @@ namespace DataAccess
                         objEmpresa.nemonico = sqlite_datareader["NEMONICO"].ToString();
                         objEmpresa.categoria = sqlite_datareader["CATEGORIA"].ToString();
                         objEmpresa.nombre = sqlite_datareader["NOMBRE"].ToString();
+                        objEmpresa.excel = Convert.ToInt32(sqlite_datareader["EXCEL"].ToString());
 
                         objListEmpresa.Add(objEmpresa);
                     }
@@ -190,7 +192,7 @@ namespace DataAccess
                 {
                     dbConn.Open();
                     sqlite_cmd = dbConn.CreateCommand();
-                    sqlite_cmd.CommandText = "SELECT * FROM EMPRESA WHERE NEMONICO = '" + nemonico +"'";
+                    sqlite_cmd.CommandText = "SELECT ID, NEMONICO, CATEGORIA, NOMBRE, EXCEL FROM EMPRESA WHERE NEMONICO = '" + nemonico +"'";
                     sqlite_datareader = sqlite_cmd.ExecuteReader();
 
                     while (sqlite_datareader.Read())
@@ -199,6 +201,7 @@ namespace DataAccess
                         objEmpresa.nemonico = sqlite_datareader["NEMONICO"].ToString();
                         objEmpresa.categoria = sqlite_datareader["CATEGORIA"].ToString();
                         objEmpresa.nombre = sqlite_datareader["NOMBRE"].ToString();
+                        objEmpresa.excel = Convert.ToInt32(sqlite_datareader["EXCEL"].ToString());
 
                     }
                 }
